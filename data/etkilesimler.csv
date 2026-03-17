@@ -1,0 +1,8 @@
+ilac_adi,etkilesen_madde,risk_seviyesi,kaynak
+warfarin,yeşil yapraklı sebzeler (K vitamini),HIGH,TİTCK/Drugs.com (örnek)
+warfarin,greyfurt suyu,LOW,Drugs.com (örnek)
+metformin,alkol,HIGH,Drugs.com (örnek)
+levotiroksin,kahve,LOW,Drugs.com (örnek)
+levotiroksin,kalsiyum (takviye/süt ürünleri),HIGH,Drugs.com (örnek)
+simvastatin,greyfurt suyu,HIGH,Drugs.com (örnek)
+amoksisilin,süt,NONE,Genel bilgi (örnek)
