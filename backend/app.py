@@ -1,13 +1,22 @@
 from __future__ import annotations
 
+import argparse
 import json
 
-from backend.graph.flow import run_once
+from main import run_agent
 
 
 def main() -> None:
-    # Minimal CLI smoke test (non-interactive by default).
-    result = run_once("warfarin", "greyfurt suyu")
+    parser = argparse.ArgumentParser(description="AEA agent runner")
+    parser.add_argument(
+        "question",
+        nargs="?",
+        default="Warfarin ile greyfurt suyu etkileşimi nedir?",
+        help="User question (interaction / side effect / general info)",
+    )
+    args = parser.parse_args()
+
+    result = run_agent(args.question)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 

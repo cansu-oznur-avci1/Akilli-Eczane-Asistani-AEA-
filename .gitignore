@@ -16,3 +16,11 @@ env/
 
 .DS_Store
 
+vector_db/chroma/
+vector_db/**/*.sqlite3
+vector_db/**/*.db
+
+# Ingested document PDFs (keep directory, ignore large binaries)
+pdfs/**/*.pdf
+pdfs/**/*.PDF
+
