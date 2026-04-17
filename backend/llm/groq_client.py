@@ -6,6 +6,10 @@ from typing import Optional
 
 from dotenv import load_dotenv
 
+# .env dosyasını modül yüklenirken bir kere oku.
+# override=False: Admin panelinden sonradan set edilen os.environ değerlerini ezmez.
+load_dotenv(override=False)  # İlk yükleme: mevcut env değerlerini korur
+
 
 @dataclass(frozen=True)
 class GroqConfig:
@@ -15,8 +19,12 @@ class GroqConfig:
 
 
 def load_groq_config(dotenv_path: Optional[str] = None) -> GroqConfig:
-    # Loads from .env by default; dotenv_path allows explicit file path if desired.
-    load_dotenv(dotenv_path=dotenv_path, override=False)
+    # dotenv_path verilirse o dosyayı da oku.
+    # override=True: Dışarıdan verilen env değerleri (admin paneli os.environ ayarları)
+    # .env dosyasındakilerden önce gelir — böylece admin panelinde seçilen
+    # model/temperature geçerli olur.
+    if dotenv_path:
+        load_dotenv(dotenv_path=dotenv_path, override=True)
     api_key = os.getenv("GROQ_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError(

@@ -26,7 +26,6 @@ class InteractionRecord:
     ilac_adi: str
     etkilesen_madde: str
     risk_seviyesi: RiskLevel
-    kaynak: str
 
 
 def _norm(text: str) -> str:
@@ -66,13 +65,12 @@ class RuleEngine:
             reader = csv.DictReader(f)
             headers = set(reader.fieldnames or [])
 
-            interaction_required = {"ilac_adi", "etkilesen_madde", "risk_seviyesi", "kaynak"}
-            side_effect_required = {"ilac_adi", "yan_etki", "risk_seviyesi", "kaynak"}
+            interaction_required = {"ilac_adi", "etkilesen_madde", "risk_seviyesi"}
+            side_effect_required = {"ilac_adi", "yan_etki", "risk_seviyesi"}
             general_info_required = {
                 "ilac_adi",
                 "genel_bilgi_konusu",
-                "risk_seviyesi",
-                "kaynak",
+                "risk_seviyesi"
             }
 
             if not interaction_required.issubset(headers):
@@ -83,7 +81,6 @@ class RuleEngine:
 
             for row in reader:
                 ilac = (row.get("ilac_adi") or "").strip()
-                kaynak = (row.get("kaynak") or "").strip()
 
                 # 1) Interaction index (mandatory for the current CSV format)
                 madde = (row.get("etkilesen_madde") or "").strip()
@@ -98,7 +95,6 @@ class RuleEngine:
                         ilac_adi=ilac,
                         etkilesen_madde=madde,
                         risk_seviyesi=risk,
-                        kaynak=kaynak,
                     )
                     self._index_interaction[(_norm(ilac), _norm(madde))] = rec
 
@@ -110,7 +106,6 @@ class RuleEngine:
                             ilac_adi=ilac,
                             etkilesen_madde=yan_etki,
                             risk_seviyesi=risk,
-                            kaynak=kaynak,
                         )
                         self._index_side_effect[(_norm(ilac), _norm(yan_etki))] = rec
 
@@ -122,7 +117,6 @@ class RuleEngine:
                             ilac_adi=ilac,
                             etkilesen_madde=genel_konu,
                             risk_seviyesi=risk,
-                            kaynak=kaynak,
                         )
                         self._index_general_info[(_norm(ilac), _norm(genel_konu))] = rec
 

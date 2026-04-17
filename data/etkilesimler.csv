@@ -1,8 +1,151 @@
-ilac_adi,etkilesen_madde,risk_seviyesi,kaynak
-warfarin,yeşil yapraklı sebzeler (K vitamini),HIGH,Demo kural (örnek; kaynak doğrulanacak)
-warfarin,greyfurt suyu,LOW,Demo kural (örnek; kaynak doğrulanacak)
-simvastatin,greyfurt suyu,HIGH,Demo kural (örnek; kaynak doğrulanacak)
-levotiroksin,kahve (kullanım öncesi/ile birlikte),LOW,Demo kural (örnek; kaynak doğrulanacak)
-levotiroksin,kalsiyum takviyeleri (süt ürünleriyle birlikte),HIGH,Demo kural (örnek; kaynak doğrulanacak)
-metformin,alkol (akut/yoğun alım),HIGH,Demo kural (örnek; kaynak doğrulanacak)
-amoksisilin,süt,NONE,Demo kural (örnek; kaynak doğrulanacak)
+ilac_adi,etkilesen_madde,risk_seviyesi
+Alkol,Barbitüratlar,HIGH
+Allopurinol,Antineoplastikler,LOW
+Allopurinol,Siklofosfamid,LOW
+Allopurinol,tiazidler,HIGH
+Aminoglikozit,Aminoglikozit,LOW
+Aminoglikozit,Dimenhidrinat,LOW
+Aminoglikozit,Eter,LOW
+Aminoglikozit,Heparin,HIGH
+Aminoglikozit,Kürarizanlar,HIGH
+Aminoglikozitler,B12,LOW
+Aminoglikozit,Metoksifloran,LOW
+Anestezik İlaçlar,Rifampisin,HIGH
+Beta Blokörler,Selektif,HIGH
+Difenoksilat,SSS,LOW
+Diklofenak,Lityum,LOW
+Dipiridamol,Heparin,HIGH
+Dopamin,MAOinhibitörleri,HIGH
+Eritromisin,Glukokortikoidler,HIGH
+Eter,Aminoglikozitler,HIGH
+Guanetidin,BetanidinDebrizokin,HIGH
+Guanfasin,Antipsikotikler,LOW
+Guanfasin,Beta,HIGH
+Halojenli anestezikler,Alkol,HIGH
+Halotan,Adrenalin,HIGH
+Halotan,Hidantoinler,HIGH
+Heksobendin,Aspirin,HIGH
+Heparin,Aspirin,LOW
+Heparin,Dekstran,LOW
+Hidralazin,Diazoksid,LOW
+İnsulin,Tiroid,HIGH
+Kaptoril,Beta,LOW
+Kaptoril,Diüretikler,LOW
+Kemoterapötikler,Oral,HIGH
+Kinidin,Alkali,HIGH
+Kinidin,Digital,LOW
+Kinidin,Reserpin,LOW
+Kinidin,Tubokürarin,LOW
+Kinidin,Varfarin,HIGH
+Klonidin,Nitroprusiyat,HIGH
+kloramfenikol,hidantoin,HIGH
+kloramfenikol,tolbutamid,LOW
+Kloramfenikol,Barbitüratlar,LOW
+Klorpromazin,İnsulin,HIGH
+Klortiazid,Allopurinol,HIGH
+Klortiazid,Digital,HIGH
+Klortiazid,Karbenoksolon,HIGH
+Klortiazid,Klorpropamid,LOW
+Klortiazid,Lityum,HIGH
+Klortiazid,Probenesid,LOW
+Klortiazid,Tübokürarin,HIGH
+Kolestiramin,Tiroit,HIGH
+Lidokain,Barbitüratlar,HIGH
+Lidokain,Benzodiazepinler,LOW
+Lidokain,Beta,HIGH
+MAO İnhibitörleri,İnsulin,LOW
+Metildopa,Lityum,HIGH
+Metildopa,Metotrimeprazin,HIGH
+Metildopa,Noradrenalin,HIGH
+Metoklopramid,Nöroleptikler,HIGH
+Metoksifluran,Tetrasiklin,HIGH
+Metotreksat,alkol,HIGH
+Metotreksat,Aspirin,LOW
+Metotreksat,PABA,LOW
+Metotreksat,Probenesid,LOW
+Metotreksat,Sitarabin,HIGH
+Metotreksat,Sülfizoksazol,LOW
+Naproksen,Oral,HIGH
+Netilmisin,Digoksin,LOW
+Netilmisin,Etakrinik,LOW
+Nimarazol,alkol,HIGH
+Nitritler,Alkol,HIGH
+Nitroprussid,Ganglioplejikler,LOW
+Oral Antidiabetikler,Androjen,LOW
+Oral Antikoagulanlar,Oral,HIGH
+Oral Antikoagulanlar,Kortikosteroit,HIGH
+Oral Antikoagulanlar,Tiroit,HIGH
+Oral Antikoagulanlar,Çeşitli,HIGH
+Parasetamol,Alkol,LOW
+Parasetamol,Barbituratlar,HIGH
+Parasetamol,Kodein,HIGH
+Parasetamol,Metoklopramid,LOW
+Pargilin,İnsülin,LOW
+Pargilin,Meperidin,HIGH
+Pargilin,Sempatomimetikler,HIGH
+Pargilin,Trisiklik,HIGH
+Penisilin,Eritromisin,HIGH
+Penisilin,Kontraseptifler,HIGH
+Penisilinler,Aspirin,LOW
+Penisilin,Probenisid,HIGH
+Pirazolonlar,Androjen,HIGH
+Pirazolonlar,Hidantoinler,LOW
+Pirazolonlar,Kolestiramin,HIGH
+Pirazolonlar,Oral,HIGH
+Pirazolonlar,Salisilatlar,HIGH
+Pirazolonlar,Testosteronlar,HIGH
+Polipeptid antibiyotikler (kolismetat),Birlikte,HIGH
+Prepedil,MAO,HIGH
+Prokain,Ekotiyofat,HIGH
+Propranolol,İnsulin,LOW
+Reserpin,Alkol,HIGH
+Reserpin,Barbitüratlar,LOW
+Reserpin,Digital,HIGH
+Reserpin,Kinidin,HIGH
+Reserpin,MAO,HIGH
+Reserpin,Metotrimeprazin,HIGH
+Salisilatlar,Alkol,HIGH
+Salisilatlar,Antikoagülanlar,HIGH
+Salisilatlar,Antineoplastikle,HIGH
+Salisilatlar,Hidantoinler,HIGH
+Salisilatlar,Kortikosteroidler,HIGH
+Salisilatlar,Oral,HIGH
+Salisilatlar,Parasetamol,HIGH
+Salisilatlar,PAS,HIGH
+Salisilatlar,Penisilinler,LOW
+Salisilatlar,Pirazolonlar,HIGH
+Sefalosporinler,Aminoglikozitler,HIGH
+Sefalosporinler,Furosemit,HIGH
+Sefalosporinler,Kolistin,HIGH
+Simetidin,Teofilin,LOW
+Sisplatin,Aminoglikozid,LOW
+Sulindak,Oral,HIGH
+Sülfonamidler,Alkol,HIGH
+Sülfonamidler,Antikuagülan,LOW
+Sülfonamidler,Fenitoin,LOW
+Sülfonamidler,Metotreksat,LOW
+Sülfonamidler,Oral,LOW
+Sülfonamidler,Paraldehit,HIGH
+Sülfonamidler,Sülfinpirazon,HIGH
+Sülfonamidler,Tiyopental,HIGH
+Tetrasiklin,Furosemit,HIGH
+Tetrasiklinler,Metoksifluran,HIGH
+Triksiklik Antidepresanlar,Tiroit,LOW
+Tübokürarin Morfin parenteral verilişlerinde d,tübokürarinin,HIGH
+Asetazolamid,Aspirin,HIGH
+Asetazolamid,Barbitüratlar,HIGH
+Asetazolamid,Trisiklik,HIGH
+Azopropazon,Alkol,HIGH
+Azopropazon,Hidantoinle,HIGH
+Antasidler,Oral,LOW
+Antibiyotikler,idrokortizon,HIGH
+Antiepileptik ilaçlar,Oral,HIGH
+Antihistaminikler,SSS,HIGH
+Antikolinerjikler Trisiklik antidepresanlarla birlikte anti,kolinerjik,LOW
+warfarin,yeşil yapraklı sebzeler,HIGH
+warfarin,greyfurt suyu,LOW
+simvastatin,greyfurt suyu,HIGH
+levotiroksin,kahve,LOW
+levotiroksin,kalsiyum takviyeleri,HIGH
+metformin,alkol,HIGH
+amoksisilin,süt,NONE

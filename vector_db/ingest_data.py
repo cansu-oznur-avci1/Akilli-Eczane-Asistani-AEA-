@@ -8,15 +8,14 @@ import shutil
 from pathlib import Path
 from typing import Iterable, List, Optional
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-try:
-    # Prefer the newer embeddings package when available.
-    from langchain_huggingface import HuggingFaceEmbeddings  # type: ignore
-except ImportError:  # pragma: no cover
-    from langchain_community.embeddings import HuggingFaceEmbeddings  # type: ignore
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 
 def _iter_pdfs(input_dir: Path, glob_pattern: str) -> List[Path]:
@@ -124,22 +123,19 @@ def ingest(
         )
         return
 
+    raw_docs = _load_documents(pdfs)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    chunks = splitter.split_documents(raw_docs)
+    ids = _make_ids(chunks)
+
     if clear and persist_dir.exists():
         shutil.rmtree(persist_dir)
 
     persist_dir.mkdir(parents=True, exist_ok=True)
 
-    embeddings = HuggingFaceEmbeddings(model_name=embedding_model)
-
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". ", " ", ""],
+    embeddings = HuggingFaceEmbeddings(
+        model_name=embedding_model
     )
-
-    raw_docs = _load_documents(pdfs)
-    chunks = splitter.split_documents(raw_docs)
-    ids = _make_ids(chunks)
 
     vectorstore = Chroma(
         collection_name=collection_name,
@@ -175,7 +171,7 @@ def main() -> None:
     parser.add_argument(
         "--embedding-model",
         type=str,
-        default=os.getenv("AEA_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"),
+        default=os.getenv("AEA_EMBEDDING_MODEL","sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"),
     )
     parser.add_argument("--glob", type=str, default=os.getenv("AEA_PDF_GLOB", "*.pdf"))
     parser.add_argument("--chunk-size", type=int, default=int(os.getenv("AEA_CHUNK_SIZE", "900")))
