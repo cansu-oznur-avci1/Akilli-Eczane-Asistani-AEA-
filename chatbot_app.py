@@ -105,7 +105,7 @@ with st.sidebar:
     st.header("⚙️ Admin Paneli")
     
     admin_pass = st.text_input("Admin Şifresi", type="password")
-    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "aea2024")
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
     
     if admin_pass == ADMIN_PASSWORD:
         st.success("Admin girişi başarılı")
