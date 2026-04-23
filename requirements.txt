@@ -11,5 +11,7 @@ sentence-transformers>=3.0.0
 langchain-openai>=0.1.0
 langfuse>=2.0.0
 langsmith>=0.1.0
-duckduckgo-search>=4.0.0
-
+ddgs>=1.0.0
+langchain-huggingface>=0.1.0
+tavily-python>=0.3.0
+langchain-tavily>=0.0.1

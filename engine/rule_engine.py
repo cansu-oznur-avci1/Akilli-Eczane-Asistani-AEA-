@@ -7,6 +7,9 @@ from enum import Enum
 from pathlib import Path
 from typing import Dict, Iterable, Optional, Tuple
 
+from pydantic import BaseModel, Field
+from langchain_core.tools import tool
+
 
 class RiskLevel(str, Enum):
     HIGH = "HIGH"
@@ -185,4 +188,30 @@ class RuleEngine:
     def iter_rules(self) -> Iterable[InteractionRecord]:
         self.load()
         return list(self._index_interaction.values()) + list(self._index_side_effect.values()) + list(self._index_general_info.values())
+
+
+class RuleEngineInput(BaseModel):
+    ilac_adi: str = Field(..., description="Kullanıcının sorduğu ana ilaç adı veya etken madde (Örn: Parasetamol, Aferin)")
+    hedef: str = Field(..., description="Etkileşim veya genel bilgi istenen ikincil ilaç/madde veya semptom/yan etki adı")
+    query_type: str = Field("interaction", description="Sorgu türü: 'interaction', 'side_effect' veya 'general_info'")
+
+
+@tool("check_drug_risk_tool", args_schema=RuleEngineInput, return_direct=False)
+def check_drug_risk_tool(ilac_adi: str, hedef: str, query_type: str = "interaction") -> str:
+    """
+    Belirtilen ilaç/madde ile diğer bir hedef (diğer ilaç, besin, semptom) arasındaki risk değerlendirmesini Deterministic Kural Motoruna sorar.
+    Bu araç, risk seviyesini net olarak sınıflandırmak için kullanılmalıdır.
+    Yanıtı "HIGH", "LOW", "NONE" veya "UNKNOWN" olacaktır.
+    """
+    engine = RuleEngine()
+    
+    # enum convert
+    q_type = QueryType.INTERACTION
+    if query_type == "side_effect":
+        q_type = QueryType.SIDE_EFFECT
+    elif query_type == "general_info":
+        q_type = QueryType.GENERAL_INFO
+        
+    risk = engine.risk_of_typed(ilac_adi, hedef, q_type)
+    return f"Kural Motoru Risk Seviyesi: {risk.value}"
 

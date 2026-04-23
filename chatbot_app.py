@@ -1,148 +1,187 @@
 import streamlit as st
 from main import run_agent
 import os
+import pandas as pd
+import json
 
 st.set_page_config(page_title="Akıllı Eczacı Asistanı", page_icon="💊")
 
-st.title("💊 Akıllı Eczacı Asistanı (AEA)")
-st.markdown("İlaç etkileşimleri, yan etkiler ve genel farmakoloji hakkında sorularınızı sorabilirsiniz.")
+# Initialize session state for auth
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+    st.session_state.role = None
 
-# Mesaj geçmişini saklamak için session state kullanımı
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Önceki mesajları ekranda gösterme
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# Kullanıcıdan yeni girdi alma
-if prompt := st.chat_input("Sorunuzu buraya yazın..."):
-    # Kullanıcı mesajını ekleme ve gösterme
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    # Asistan yanıtını alma ve gösterme
-    with st.chat_message("assistant"):
-        status_box = st.status("🔍 Sorunuz analiz ediliyor...", expanded=True)
-        yanit = "Yanıt üretilemedi."
-        response_state = {}
-        try:
-            with status_box:
-                st.write("📋 **1. Adım:** Sorgu kategorize ediliyor...")
-                history = st.session_state.messages[:-1]
-
-                # Kategoriyi önceden göster
-                from main import (
-                    _categorize_query_text,
-                    _extract_interaction_entities,
-                    _extract_side_effect_entities,
-                    _extract_general_entities,
-                )
-                q_type = _categorize_query_text(prompt)
-                type_labels = {
-                    "interaction": "💊 İlaç Etkileşimi",
-                    "side_effect": "⚠️ Yan Etki",
-                    "general_info": "ℹ️ Genel Bilgi",
-                    "unknown": "❓ Bilinmiyor",
-                }
-                st.write(f"   Tür: **{type_labels.get(q_type, q_type)}**")
-
-                st.write("📚 **2. Adım:** Kural motoru & vektör veritabanı aranıyor...")
-                response_state = run_agent(prompt, history)
-                yanit = response_state.get("yanit", "Yanıt üretilemedi.")
-
-                # Kaynak bilgisi
-                rag_ozet = response_state.get("rag_ozet", "")
-                if rag_ozet.startswith("[WEB KAYNAĞI"):
-                    kaynak = "🌐 Web Araması (DuckDuckGo)"
-                elif rag_ozet and len(rag_ozet.strip()) > 10:
-                    kaynak = "📗 KÜB/KT Vektör Veritabanı (RAG)"
-                else:
-                    kaynak = "🔧 Deterministik (Kural Motoru)"
-
-                st.write(f"   Kullanılan Kaynak: **{kaynak}**")
-                st.write("🤖 **3. Adım:** Yanıt üretiliyor (LLM)...")
-
-            status_box.update(label="✅ Yanıt hazır!", state="complete", expanded=False)
-
-            # Geliştirici özeti
-            with st.expander("🛠️ Geliştirici Özeti (Sistem Çıktıları)"):
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.write(f"**Sorgu Türü:** {response_state.get('query_type', '—')}")
-                    st.write(f"**Tespit Edilen İlaç:** {response_state.get('ilac_adi', '—') or '—'}")
-                    st.write(f"**İlgili Madde/Semptom:** {response_state.get('etkilesen_madde', '') or response_state.get('yan_etki', '') or '—'}")
-                with col2:
-                    st.write(f"**Risk Seviyesi:** {response_state.get('risk_seviyesi', '—')}")
-                    st.write(f"**Kaynak:** {kaynak}")
-                    rag_chunks = response_state.get("rag_chunks", [])
-                    st.write(f"**RAG Chunk Sayısı:** {len(rag_chunks)}")
-                # RAG chunk kaynakları — hangi PDF'den geldi?
-                if rag_chunks:
-                    st.markdown("**RAG Chunk Kaynakları:**")
-                    for i, ch in enumerate(rag_chunks[:4]):
-                        import os as _os
-                        src = response_state.get('rag_ozet', '')
-                        # chunk text önizlemesi
-                        preview = ch[:120].replace("\n", " ") if ch else "—"
-                        st.caption(f"`Chunk {i+1}:` {preview}...")
-
-            st.markdown(yanit)
-
-        except Exception as e:
-            status_box.update(label="❌ Hata oluştu", state="error", expanded=False)
-            yanit = f"Bir hata oluştu: {str(e)}"
-            st.markdown(yanit)
-
-    # Asistan yanıtını mesaj geçmişine ekleme
-    st.session_state.messages.append({"role": "assistant", "content": yanit})
-
-
-# Sidebar — Admin Paneli
-with st.sidebar:
-    st.header("⚙️ Admin Paneli")
-    
-    admin_pass = st.text_input("Admin Şifresi", type="password")
-    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
-    
-    if admin_pass == ADMIN_PASSWORD:
-        st.success("Admin girişi başarılı")
-        
-        # Model seçimi
-        GROQ_MODELS = {
-            # ── Production ──────────────────────────────────────────────
-            "llama-3.1-8b-instant":             "⚡ Llama 3.1 8B Instant [Production]",
-            "llama-3.3-70b-versatile":          "🦙 Llama 3.3 70B Versatile [Production]",
-            "openai/gpt-oss-120b":              "🤖 GPT OSS 120B [Production]",
-            "openai/gpt-oss-20b":               "🤖 GPT OSS 20B [Production]",
-            # ── Preview (deneysel) ──────────────────────────────────────
-            "meta-llama/llama-4-scout-17b-16e-instruct": "🔬 Llama 4 Scout 17B [Preview]",
-            "qwen/qwen3-32b":                   "🔬 Qwen3 32B [Preview]",
+def load_users():
+    if not os.path.exists("data/users.json"):
+        admin_pass = os.getenv("ADMIN_PASSWORD", "admin123")
+        user_pass = os.getenv("USER_PASSWORD", "user123")
+        default_users = {
+            "admin": {"password": admin_pass, "role": "admin"},
+            "user": {"password": user_pass, "role": "user"}
         }
-        model_display = st.selectbox(
-            "LLM Modeli",
-            options=list(GROQ_MODELS.keys()),
-            format_func=lambda x: GROQ_MODELS[x],
-            index=0
-        )
-        os.environ["GROQ_MODEL"] = model_display
-        
-        # Temperature
-        temp = st.slider("Temperature", 0.0, 1.0, 
-                         float(os.getenv("GROQ_TEMPERATURE", "0.2")), 0.05)
-        os.environ["GROQ_TEMPERATURE"] = str(temp)
-        
-        # RAG k değeri
-        rag_k = st.slider("RAG Chunk Sayısı (k)", 1, 8, 4)
-        os.environ["AEA_RAG_K"] = str(rag_k)
-        
-        # Web search toggle
-        web_search = st.toggle("Web Search Fallback", value=False)
-        os.environ["AEA_WEB_SEARCH"] = "1" if web_search else "0"
-        
-        st.divider()
-        st.caption(f"Model: {model_display} | Temp: {temp} | k: {rag_k}")
-    elif admin_pass:
-        st.error("Yanlış şifre")
+        os.makedirs("data", exist_ok=True)
+        with open("data/users.json", "w", encoding="utf-8") as f:
+            json.dump(default_users, f)
+        return default_users
+    else:
+        with open("data/users.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+
+def save_users(users):
+    os.makedirs("data", exist_ok=True)
+    with open("data/users.json", "w", encoding="utf-8") as f:
+        json.dump(users, f, ensure_ascii=False, indent=4)
+
+def login_page():
+    st.title("Hoş Geldiniz")
+    tab1, tab2 = st.tabs(["Giriş Yap", "Kayıt Ol"])
+    
+    users = load_users()
+
+    with tab1:
+        st.write("Lütfen devam etmek için giriş yapın.")
+        username = st.text_input("Kullanıcı Adı", key="login_user")
+        password = st.text_input("Şifre", type="password", key="login_pass")
+        if st.button("Giriş"):
+            if username in users and users[username]["password"] == password:
+                st.session_state.logged_in = True
+                st.session_state.role = users[username]["role"]
+                st.rerun()
+            else:
+                st.error("Geçersiz kullanıcı adı veya şifre!")
+
+    with tab2:
+        st.write("Yeni bir hesap oluşturun.")
+        new_username = st.text_input("Kullanıcı Adı", key="reg_user")
+        new_password = st.text_input("Şifre", type="password", key="reg_pass")
+        if st.button("Kayıt Ol"):
+            if not new_username or not new_password:
+                st.error("Lütfen kullanıcı adı ve şifre girin.")
+            elif new_username in users:
+                st.warning(f"'{new_username}' kullanıcısı zaten kayıtlı. Eğer şifrenizi değiştirmek istiyorsanız lütfen yönetici ile iletişime geçin veya 'Giriş Yap' sekmesini kullanın.")
+            else:
+                users[new_username] = {"password": new_password, "role": "user"}
+                save_users(users)
+                st.success("Kayıt başarılı! Şimdi 'Giriş Yap' sekmesinden giriş yapabilirsiniz.")
+
+def user_page():
+    # Only Chatbot Interface
+    st.title("💊 Akıllı Eczacı Asistanı (AEA)")
+    st.markdown("İlaç etkileşimleri, yan etkiler ve genel farmakoloji hakkında sorularınızı sorabilirsiniz.")
+
+    col1, col2 = st.columns([8, 1])
+    with col2:
+        if st.button("Çıkış"):
+            st.session_state.logged_in = False
+            st.session_state.role = None
+            st.session_state.messages = []
+            st.rerun()
+
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if prompt := st.chat_input("Sorunuzu buraya yazın..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Yanıt üretiliyor..."):
+                try:
+                    history = st.session_state.messages[:-1]
+                    response_state = run_agent(prompt, history)
+                    yanit = response_state.get("yanit", "Yanıt üretilemedi.")
+                    st.markdown(yanit)
+                except Exception as e:
+                    yanit = f"Bir hata oluştu: {str(e)}"
+                    st.markdown(yanit)
+
+        st.session_state.messages.append({"role": "assistant", "content": yanit})
+
+def admin_page():
+    col1, col2 = st.columns([8, 1])
+    with col1:
+        st.title("⚙️ Admin Paneli")
+    with col2:
+        if st.button("Çıkış"):
+            st.session_state.logged_in = False
+            st.session_state.role = None
+            st.rerun()
+
+    st.header("LLM Ayarları")
+    GROQ_MODELS = {
+        "llama-3.1-8b-instant": "⚡ Llama 3.1 8B Instant",
+        "llama-3.3-70b-versatile": "🦙 Llama 3.3 70B Versatile",
+        "openai/gpt-oss-120b": "🤖 GPT OSS 120B",
+        "openai/gpt-oss-20b": "🤖 GPT OSS 20B",
+    }
+    model_display = st.selectbox(
+        "LLM Modeli",
+        options=list(GROQ_MODELS.keys()),
+        format_func=lambda x: GROQ_MODELS[x],
+        index=0
+    )
+    os.environ["GROQ_MODEL"] = model_display
+
+    temp = st.slider("Temperature", 0.0, 1.0, float(os.getenv("GROQ_TEMPERATURE", "0.2")), 0.05)
+    os.environ["GROQ_TEMPERATURE"] = str(temp)
+
+    rag_k = st.slider("RAG Chunk Sayısı (k)", 1, 8, 4)
+    os.environ["AEA_RAG_K"] = str(rag_k)
+
+    web_search = st.toggle("Web Search Fallback", value=False)
+    os.environ["AEA_WEB_SEARCH"] = "1" if web_search else "0"
+
+    st.divider()
+
+    st.header("Kural Tablosu Yönetimi (etkilesimler.csv)")
+    csv_path = "data/etkilesimler.csv"
+    
+    if os.path.exists(csv_path):
+        df = pd.read_csv(csv_path)
+        st.dataframe(df)
+
+        st.subheader("Yeni Etkileşim Ekle")
+        with st.form("add_interaction"):
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                ilac = st.text_input("İlaç Adı")
+            with c2:
+                madde = st.text_input("Etkileşen Madde")
+            with c3:
+                risk = st.selectbox("Risk Seviyesi", ["HIGH", "LOW", "NONE", "UNKNOWN"])
+            
+            if st.form_submit_button("Ekle"):
+                if ilac and madde:
+                    new_row = pd.DataFrame({"ilac_adi": [ilac], "etkilesen_madde": [madde], "risk_seviyesi": [risk]})
+                    df = pd.concat([df, new_row], ignore_index=True)
+                    df.to_csv(csv_path, index=False)
+                    st.success("Başarıyla eklendi!")
+                    st.rerun()
+                else:
+                    st.error("Lütfen İlaç Adı ve Etkileşen Maddeyi doldurun.")
+
+        st.subheader("Etkileşim Çıkar")
+        with st.form("remove_interaction"):
+            remove_idx = st.number_input("Silinecek Satır İndeksi (0'dan başlar)", min_value=0, max_value=len(df)-1 if len(df)>0 else 0, step=1)
+            if st.form_submit_button("Sil"):
+                if len(df) > 0 and 0 <= remove_idx < len(df):
+                    df = df.drop(remove_idx)
+                    df.to_csv(csv_path, index=False)
+                    st.success("Başarıyla silindi!")
+                    st.rerun()
+                else:
+                    st.error("Geçersiz indeks.")
+    else:
+        st.warning("CSV dosyası bulunamadı!")
+
+if not st.session_state.logged_in:
+    login_page()
+elif st.session_state.role == "admin":
+    admin_page()
+elif st.session_state.role == "user":
+    user_page()

@@ -4,7 +4,7 @@ from typing import List
 def web_search_fallback(query: str, max_results: int = 3) -> str:
     """RAG kanıtı bulunamazsa web'de ara."""
     try:
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
         results = []
         with DDGS() as ddgs:
             for r in ddgs.text(

@@ -24,3 +24,5 @@ vector_db/**/*.db
 pdfs/**/*.pdf
 pdfs/**/*.PDF
 
+data/users.json
+

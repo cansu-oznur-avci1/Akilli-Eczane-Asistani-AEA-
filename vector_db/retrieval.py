@@ -11,7 +11,7 @@ load_dotenv()
 
 from langchain_chroma import Chroma
 
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 
 @dataclass(frozen=True)
