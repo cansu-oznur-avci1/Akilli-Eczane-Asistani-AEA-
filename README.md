@@ -10,12 +10,12 @@ Bu uygulama, hem deterministik (kural tabanlı) kontrolleri hem de LLM destekli 
 
 -   **Deterministik Kural Motoru:** Risk puanı ve kritik etkileşimler için önceden tanımlanmış veri tabanını kullanarak %100 doğruluk sağlar.
 -   **Gelişmiş RAG Sistemi:** KÜB (Kısa Ürün Bilgisi) ve KT (Kullanma Talimatı) PDF'leri üzerinden bağlamsal bilgi çıkarımı.
+-   **Modern ve Profesyonel Arayüz (Gemini-like):** Özel CSS mimarisi ile kusursuz çalışan **Karanlık (Dark) ve Aydınlık (Light) Tema** desteği.
+-   **Akıllı Sohbet Geçmişi:** Yapay zeka tarafından otomatik isimlendirilen, SQLite tabanlı kalıcı sohbet geçmişi (Eski sohbetlere dönme ve silme imkanı).
+-   **Çoklu Dil Desteği (TR/EN):** Tek tuşla kullanıcı arayüzünü ve yapay zeka çıktılarını İngilizce veya Türkçe'ye çevirme.
 -   **Çok Sayfalı ve Güvenli Yapı (RBAC):** Admin ve User rolleri ile yetkilendirilmiş erişim kontrolü.
--   **Kullanıcı Kayıt Sistemi:** Yeni kullanıcıların hesap oluşturabilmesi için kalıcı kayıt (JSON tabanlı) altyapısı.
--   **Gelişmiş Admin Paneli:** Model parametrelerini (temperature, k, web search) canlı olarak yapılandırma ve kural tablosunu (CSV) düzenleme arayüzü.
--   **Web Arama Desteği (Opsiyonel):** Yerel belgelerde bulunmayan bilgiler için Tavily üzerinden güncel araştırma.
--   **Modern Streamlit Arayüzü:** Kullanıcı dostu, hızlı ve interaktif sohbet arayüzü.
--   **Hızlı Yanıt:** Groq (Llama 3.1) veya OpenAI altyapısı ile milisaniyeler içerisinde yanıt üretimi.
+-   **Gelişmiş Admin Paneli:** Model parametrelerini canlı olarak yapılandırma ve kural tablosunu düzenleme arayüzü.
+-   **Web Arama Desteği (Opsiyonel):** Yerel belgelerde bulunmayan bilgiler için arama motoru entegrasyonu.
 
 ---
 
