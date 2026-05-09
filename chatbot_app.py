@@ -164,10 +164,15 @@ def login_page():
     lang = st.session_state.lang
     st.title(get_text(lang, "login_title"))
     
-    c1, c2 = st.columns([8, 2])
+    c1, c2, c3 = st.columns([6, 2, 2])
     with c2:
+        theme_btn_text = "☀️ Light" if st.session_state.dark_theme else "🌙 Dark"
+        if st.button(theme_btn_text, use_container_width=True, key="login_theme_btn"):
+            st.session_state.dark_theme = not st.session_state.dark_theme
+            st.rerun()
+    with c3:
         lang_btn_text = "🇬🇧 EN" if lang == "tr" else "🇹🇷 TR"
-        if st.button(lang_btn_text, use_container_width=True):
+        if st.button(lang_btn_text, use_container_width=True, key="login_lang_btn"):
             st.session_state.lang = "en" if lang == "tr" else "tr"
             st.rerun()
 
@@ -250,6 +255,19 @@ def user_page():
                     st.rerun()
                     
         st.divider()
+        with st.expander(get_text(lang, "change_pass_title")):
+            with st.form("user_change_pass"):
+                new_pass = st.text_input(get_text(lang, "new_password"), type="password")
+                if st.form_submit_button(get_text(lang, "change_btn")):
+                    if new_pass:
+                        users = load_users()
+                        uname = st.session_state.username
+                        if uname in users:
+                            users[uname]["password"] = new_pass
+                            save_users(users)
+                            st.success(get_text(lang, "pass_changed_success"))
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         if st.button(get_text(lang, "logout"), use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.role = None
@@ -298,6 +316,8 @@ def user_page():
                     elif node_name == "Asistan_LLM":
                         status_container.write(get_text(lang, "status_generate"))
                         final_response = state.get("yanit", get_text(lang, "error_msg"))
+                    elif node_name == "Halisunasyon_Kontrol_Node":
+                        status_container.write(get_text(lang, "status_reflexion"))
                 
                 status_container.update(label=get_text(lang, "status_complete"), state="complete", expanded=False)
                 formatted_yanit = format_assistant_response(final_response)
@@ -313,16 +333,39 @@ def user_page():
                 st.session_state.messages.append({"role": "assistant", "content": yanit})
 
 def admin_page():
-    col1, col2 = st.columns([8, 1])
+    lang = st.session_state.lang
+    col1, col2, col3, col4 = st.columns([6, 1, 1, 1])
     with col1:
-        st.title("⚙️ Admin Paneli")
+        st.title("⚙️ " + ("Admin Panel" if lang == "en" else "Admin Paneli"))
     with col2:
-        if st.button("Çıkış"):
+        theme_btn_text = "☀️ Light" if st.session_state.dark_theme else "🌙 Dark"
+        if st.button(theme_btn_text, use_container_width=True):
+            st.session_state.dark_theme = not st.session_state.dark_theme
+            st.rerun()
+    with col3:
+        lang_btn_text = "🇬🇧 EN" if lang == "tr" else "🇹🇷 TR"
+        if st.button(lang_btn_text, use_container_width=True):
+            st.session_state.lang = "en" if lang == "tr" else "tr"
+            st.rerun()
+    with col4:
+        if st.button(get_text(lang, "logout"), use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.role = None
             st.rerun()
 
-    st.header("LLM Ayarları")
+    with st.expander(get_text(lang, "change_pass_title")):
+        with st.form("admin_change_pass"):
+            new_pass = st.text_input(get_text(lang, "new_password"), type="password")
+            if st.form_submit_button(get_text(lang, "change_btn")):
+                if new_pass:
+                    users = load_users()
+                    uname = st.session_state.username
+                    if uname in users:
+                        users[uname]["password"] = new_pass
+                        save_users(users)
+                        st.success(get_text(lang, "pass_changed_success"))
+
+    st.header(get_text(lang, "admin_llm_settings"))
     GROQ_MODELS = {
         "llama-3.1-8b-instant": "⚡ Llama 3.1 8B Instant",
         "llama-3.3-70b-versatile": "🦙 Llama 3.3 70B Versatile",
@@ -330,7 +373,7 @@ def admin_page():
         "openai/gpt-oss-20b": "🤖 GPT OSS 20B",
     }
     model_display = st.selectbox(
-        "LLM Modeli",
+        get_text(lang, "admin_llm_model"),
         options=list(GROQ_MODELS.keys()),
         format_func=lambda x: GROQ_MODELS[x],
         index=0
@@ -348,46 +391,107 @@ def admin_page():
 
     st.divider()
 
-    st.header("Kural Tablosu Yönetimi (etkilesimler.csv)")
+    st.header(get_text(lang, "admin_rules_management") + " (etkilesimler.csv)")
     csv_path = "data/etkilesimler.csv"
     
     if os.path.exists(csv_path):
         df = pd.read_csv(csv_path)
         st.dataframe(df)
 
-        st.subheader("Yeni Etkileşim Ekle")
+        st.subheader(get_text(lang, "admin_add_interaction"))
         with st.form("add_interaction"):
             c1, c2, c3 = st.columns(3)
             with c1:
-                ilac = st.text_input("İlaç Adı")
+                ilac = st.text_input(get_text(lang, "admin_drug_name"))
             with c2:
-                madde = st.text_input("Etkileşen Madde")
+                madde = st.text_input(get_text(lang, "admin_interact_substance"))
             with c3:
-                risk = st.selectbox("Risk Seviyesi", ["HIGH", "LOW", "NONE", "UNKNOWN"])
+                risk = st.selectbox(get_text(lang, "admin_risk_level"), ["HIGH", "LOW", "NONE", "UNKNOWN"])
             
-            if st.form_submit_button("Ekle"):
+            if st.form_submit_button(get_text(lang, "admin_add_btn")):
                 if ilac and madde:
                     new_row = pd.DataFrame({"ilac_adi": [ilac], "etkilesen_madde": [madde], "risk_seviyesi": [risk]})
                     df = pd.concat([df, new_row], ignore_index=True)
                     df.to_csv(csv_path, index=False)
-                    st.success("Başarıyla eklendi!")
+                    st.success(get_text(lang, "admin_success_add"))
                     st.rerun()
                 else:
-                    st.error("Lütfen İlaç Adı ve Etkileşen Maddeyi doldurun.")
+                    st.error(get_text(lang, "admin_err_fill"))
 
-        st.subheader("Etkileşim Çıkar")
+        st.subheader(get_text(lang, "admin_remove_interaction"))
         with st.form("remove_interaction"):
-            remove_idx = st.number_input("Silinecek Satır İndeksi (0'dan başlar)", min_value=0, max_value=len(df)-1 if len(df)>0 else 0, step=1)
-            if st.form_submit_button("Sil"):
+            remove_idx = st.number_input(get_text(lang, "admin_remove_idx"), min_value=0, max_value=len(df)-1 if len(df)>0 else 0, step=1)
+            if st.form_submit_button(get_text(lang, "admin_remove_btn")):
                 if len(df) > 0 and 0 <= remove_idx < len(df):
                     df = df.drop(remove_idx)
                     df.to_csv(csv_path, index=False)
-                    st.success("Başarıyla silindi!")
+                    st.success(get_text(lang, "admin_success_del"))
                     st.rerun()
                 else:
-                    st.error("Geçersiz indeks.")
+                    st.error(get_text(lang, "admin_err_idx"))
     else:
-        st.warning("CSV dosyası bulunamadı!")
+        st.warning(get_text(lang, "admin_err_csv"))
+
+    st.divider()
+
+    st.header(get_text(lang, "admin_pdf_management"))
+    st.markdown(get_text(lang, "admin_pdf_desc"))
+    
+    uploaded_files = st.file_uploader(get_text(lang, "admin_pdf_select"), type="pdf", accept_multiple_files=True)
+    
+    col_a, col_b = st.columns(2)
+    with col_a:
+        if st.button(get_text(lang, "admin_pdf_upload"), use_container_width=True):
+            if uploaded_files:
+                from pathlib import Path
+                
+                os.makedirs("pdfs", exist_ok=True)
+                for uf in uploaded_files:
+                    with open(os.path.join("pdfs", uf.name), "wb") as f:
+                        f.write(uf.getbuffer())
+                
+                st.info(f"{len(uploaded_files)} PDF dosyası kaydedildi. Vektör veritabanı güncelleniyor, lütfen bekleyin...")
+                
+                try:
+                    from vector_db.ingest_data import ingest
+                    ingest(
+                        input_dir=Path("pdfs"),
+                        persist_dir=Path("vector_db/chroma"),
+                        collection_name=os.getenv("CHROMA_COLLECTION", "aea_kub_kt"),
+                        embedding_model=os.getenv("AEA_EMBEDDING_MODEL","sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"),
+                        glob_pattern="*.pdf",
+                        chunk_size=int(os.getenv("AEA_CHUNK_SIZE", "900")),
+                        chunk_overlap=int(os.getenv("AEA_CHUNK_OVERLAP", "150")),
+                        clear=False
+                    )
+                    st.success(get_text(lang, "success_db_updated"))
+                except Exception as e:
+                    st.error(f"{get_text(lang, 'error_msg')} {e}")
+            else:
+                st.warning(get_text(lang, "warning_select_pdf"))
+                
+    with col_b:
+        if st.button(get_text(lang, "admin_pdf_reset"), use_container_width=True):
+            from pathlib import Path
+            if os.path.exists("pdfs") and any(f.endswith(".pdf") for f in os.listdir("pdfs")):
+                st.info(get_text(lang, "status_rebuilding_db"))
+                try:
+                    from vector_db.ingest_data import ingest
+                    ingest(
+                        input_dir=Path("pdfs"),
+                        persist_dir=Path("vector_db/chroma"),
+                        collection_name=os.getenv("CHROMA_COLLECTION", "aea_kub_kt"),
+                        embedding_model=os.getenv("AEA_EMBEDDING_MODEL","sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"),
+                        glob_pattern="*.pdf",
+                        chunk_size=int(os.getenv("AEA_CHUNK_SIZE", "900")),
+                        chunk_overlap=int(os.getenv("AEA_CHUNK_OVERLAP", "150")),
+                        clear=True
+                    )
+                    st.success(get_text(lang, "success_db_reset"))
+                except Exception as e:
+                    st.error(f"{get_text(lang, 'error_msg')} {e}")
+            else:
+                st.warning(get_text(lang, "warning_select_pdf"))
 
 if not st.session_state.logged_in:
     login_page()

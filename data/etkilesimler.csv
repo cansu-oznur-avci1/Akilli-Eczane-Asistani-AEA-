@@ -1,5 +1,4 @@
 ilac_adi,etkilesen_madde,risk_seviyesi
-Alkol,Barbitüratlar,HIGH
 Allopurinol,Antineoplastikler,LOW
 Allopurinol,Siklofosfamid,LOW
 Allopurinol,tiazidler,HIGH
@@ -149,3 +148,4 @@ levotiroksin,kahve,LOW
 levotiroksin,kalsiyum takviyeleri,HIGH
 metformin,alkol,HIGH
 amoksisilin,süt,NONE
+Alkol,Barbitüratlar,HIGH

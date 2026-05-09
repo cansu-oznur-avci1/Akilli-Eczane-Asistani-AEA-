@@ -10,12 +10,13 @@ Bu uygulama, hem deterministik (kural tabanlı) kontrolleri hem de LLM destekli 
 
 -   **Deterministik Kural Motoru:** Risk puanı ve kritik etkileşimler için önceden tanımlanmış veri tabanını kullanarak %100 doğruluk sağlar.
 -   **Gelişmiş RAG Sistemi:** KÜB (Kısa Ürün Bilgisi) ve KT (Kullanma Talimatı) PDF'leri üzerinden bağlamsal bilgi çıkarımı.
--   **Modern ve Profesyonel Arayüz (Gemini-like):** Özel CSS mimarisi ile kusursuz çalışan **Karanlık (Dark) ve Aydınlık (Light) Tema** desteği.
--   **Akıllı Sohbet Geçmişi:** Yapay zeka tarafından otomatik isimlendirilen, SQLite tabanlı kalıcı sohbet geçmişi (Eski sohbetlere dönme ve silme imkanı).
+-   **Self-Correction (Halisünasyon Kontrolü):** Reflexion Node ile model çıktıları yayınlanmadan önce risk çelişkileri ve uydurma bilgilere (halisünasyon) karşı otonom olarak denetlenir ve gerekirse model kendi cevabını düzeltir.
+-   **Modern ve Profesyonel Arayüz:** Özel CSS mimarisi ile kusursuz çalışan **Karanlık (Dark) ve Aydınlık (Light) Tema** desteği. Giriş ekranı da dahil olmak üzere her aşamada değiştirilebilir.
+-   **Akıllı Sohbet Geçmişi:** Yapay zeka tarafından otomatik isimlendirilen, SQLite tabanlı kalıcı sohbet geçmişi.
 -   **Çoklu Dil Desteği (TR/EN):** Tek tuşla kullanıcı arayüzünü ve yapay zeka çıktılarını İngilizce veya Türkçe'ye çevirme.
--   **Çok Sayfalı ve Güvenli Yapı (RBAC):** Admin ve User rolleri ile yetkilendirilmiş erişim kontrolü.
--   **Gelişmiş Admin Paneli:** Model parametrelerini canlı olarak yapılandırma ve kural tablosunu düzenleme arayüzü.
--   **Web Arama Desteği (Opsiyonel):** Yerel belgelerde bulunmayan bilgiler için arama motoru entegrasyonu.
+-   **Çok Sayfalı ve Güvenli Yapı (RBAC):** Admin ve User rolleri ile yetkilendirilmiş erişim kontrolü, şifre değiştirme ve kayıt yönetim sistemi.
+-   **Gelişmiş Admin Paneli:** Model parametrelerini değiştirme, kural tablosunu düzenleme ve arayüz üzerinden kod yazmadan KÜB/KT belgelerini (PDF) yükleyip vektör veritabanını oluşturma.
+-   **Web Arama Desteği:** Yerel belgelerde bulunmayan bilgiler için arama motoru entegrasyonu.
 
 ---
 
@@ -25,6 +26,9 @@ Sistem üç ana katmandan oluşur:
 1.  **Rule Engine (`engine/`):** Kritik etkileşimler için CSV tabanlı hızlı kontrol.
 2.  **Vector DB (`vector_db/`):** PDF belgelerinin vektörleştirilmesi ve anlamsal arama.
 3.  **Agent Logic (`backend/`):** LangGraph tabanlı iş akışı yönetimi ve karar mekanizması.
+
+Sistemin çalışma akış grafiği:
+![LangGraph İş Akışı](AEA_flow.png)
 
 ---
 

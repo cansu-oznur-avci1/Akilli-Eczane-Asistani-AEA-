@@ -270,7 +270,7 @@ async def agent_node(state: AgentState) -> dict:
             "YOUR TASK: You are a highly professional, knowledgeable, empathetic AI named 'Smart Pharmacist Assistant (SPA)'.\n"
             "You must respond with the depth of an expert pharmacist, using a detailed, informative, and patient-friendly tone.\n\n"
             "STRICT RULES:\n"
-            "1. NO MEDICAL WARNINGS: NEVER use phrases like 'Consult your doctor', 'Seek medical advice', etc. Provide direct, clear information.\n"
+            "1. NO MEDICAL WARNINGS: NEVER use phrases like 'Consult your doctor', 'Seek medical advice', 'not medical advice', etc. Provide direct, clear information.\n"
             "2. DETAILED & ACCURATE: Do not give short answers. Explain the mechanism, usage, and details scientifically yet simply.\n"
             "3. USE EVIDENCE: Use provided CURRENT SOURCES. If no info, use your expert pharmacology knowledge. Do not say 'Not found in sources', just answer naturally.\n"
             "4. MAINTAIN CONTEXT: Consider chat history but do not mix old drugs with new ones.\n"
@@ -283,7 +283,7 @@ async def agent_node(state: AgentState) -> dict:
             "GÖREVİN: Sen, 'Akıllı Eczacı Asistanı (AEA)' adında son derece profesyonel, bilgili, empatik ve aydınlatıcı bir yapay zekasın.\n"
             "Sıradan bir asistan gibi değil, alanında uzman, tecrübeli bir eczacı kimliğiyle, detaylı ve özel bir üslupla yanıt vermelisin.\n\n"
             "KATÎ KURALLAR:\n"
-            "1. TIBBİ UYARI YASAK: Yanıtlarında KESİNLİKLE 'Doktora başvurun', 'Hekiminize danışın', 'Sağlık kuruluşuna gidin' gibi ifadeler KULLANMA. Kullanıcıya doğrudan, net ve açıklayıcı bilgi sun.\n"
+            "1. TIBBİ UYARI YASAK: Yanıtlarında KESİNLİKLE 'doktorunuza danışın', 'eczacınıza danışın', 'tıbbi tavsiye değildir', 'doktora başvurun', 'hekiminize danışın', 'sağlık kuruluşuna gidin' gibi ifadeler KULLANMA. Kullanıcıya doğrudan, net ve açıklayıcı bilgi sun.\n"
             "2. DETAYLI VE YAPIK (STRUCTURED) YANIT: Soruları asla kısa cümlelerle geçiştirme. İlacın etki mekanizmasını ve detaylarını alt başlıklar, madde imleri (bullet points) ve kalın yazılar (bold) kullanarak, son derece şık bir Markdown formatında sun.\n"
             "3. KANIT KULLANIMI: Sana sağlanan GÜNCEL KAYNAKLAR'ı öncelikli olarak kullan. Kaynaklarda yoksa genel tıbbi bilgiyle DOĞAL bir yanıt ver, 'kaynakta bulamadım' deme.\n"
             "4. BAĞLAMI KORU: Önceki sorulardaki ilaçların yan etkilerini yeni sorudaki ilaçlara KARIŞTIRMA.\n"
@@ -295,12 +295,20 @@ async def agent_node(state: AgentState) -> dict:
     if out.get("raw_research_data"):
         actual_evidence += "\n[TAVILY SONUÇLARI]\n" + out.get("raw_research_data", "")
 
+    feedback_str = ""
+    if out.get("reflexion_feedback"):
+        if lang == "en":
+            feedback_str = f"\n[CRITICAL CORRECTION NEEDED]: Your previous answer failed quality checks. Feedback: {out.get('reflexion_feedback')}\nPlease correct your answer.\n"
+        else:
+            feedback_str = f"\n[KRİTİK DÜZELTME GEREKİYOR]: Önceki cevabın kalite kontrolünden geçemedi. Geri bildirim: {out.get('reflexion_feedback')}\nLütfen cevabını buna göre düzelt.\n"
+
     user_prompt = (
         f"GÜNCEL SORU: {question}\n\n"
         f"ODAKLANILACAK İlaç: {out.get('ilac_adi', '')} | Madde: {out.get('etkilesen_madde', '')}\n"
         f"Risk Seviyesi:{out.get('risk_level', 'Bilinmiyor')}\n\n"
         f"GÜNCEL {evidence_label}\n"
         f"{actual_evidence if actual_evidence else ('No specific sources found. Use expert pharmacology knowledge.' if lang == 'en' else 'Sistem veritabanında bu ilaca dair özel belge bulunamadı. Lütfen eczacılık uzmanlığını kullanarak detaylı yanıtla.')}\n"
+        f"{feedback_str}"
     )
 
     invoke_msgs = [SystemMessage(content=system_prompt)]
@@ -323,7 +331,23 @@ async def agent_node(state: AgentState) -> dict:
 
     messages.append(response)
     out["messages"] = messages
-    out["yanit"] = getattr(response, "content", "")
+    
+    raw_yanit = getattr(response, "content", "")
+    
+    # Post-processing: remove blocked phrases
+    blocked_phrases = [
+        "doktorunuza danışın", "eczacınıza danışın", "tıbbi tavsiye değildir", 
+        "doktora başvurun", "hekiminize danışın", "sağlık kuruluşuna gidin",
+        "consult your doctor", "seek medical advice", "not medical advice"
+    ]
+    import re
+    for phrase in blocked_phrases:
+        raw_yanit = re.sub(rf"(?i){phrase}[,.]?", "", raw_yanit)
+        
+    raw_yanit = re.sub(r"(?i)lütfen\s*\.", ".", raw_yanit)
+    raw_yanit = re.sub(r"(?i)unutmayın ki\s*[,.]?", "", raw_yanit)
+    
+    out["yanit"] = raw_yanit.strip()
 
     return out
 
@@ -341,6 +365,63 @@ def route_after_rag(state: AgentState) -> Literal["Web_Ara_Tavily_Node", "Asista
         return "Web_Ara_Tavily_Node"
     return "Asistan_LLM"
 
+async def reflexion_node(state: AgentState) -> dict:
+    state_dict = state.model_dump() if hasattr(state, "model_dump") else dict(state)
+    out = dict(state_dict)
+    
+    yanit = out.get("yanit", "")
+    risk_level = out.get("risk_level", "")
+    rag_ozet = out.get("rag_ozet", "")
+    loop_count = out.get("loop_count", 0)
+
+    if not yanit or loop_count >= 2:
+        out["reflexion_status"] = "PASS"
+        return out
+
+    model = build_chat_model().bind(response_format={"type": "json_object"})
+
+    sys_msg = (
+        "You are an AI Hallucination and Safety Checker. "
+        "Review the AI's response against the provided Risk Level and Source Documents.\n"
+        "1. Check if the response contradicts the Risk Level (e.g., saying 'safe' when risk is HIGH).\n"
+        "2. Check if the response hallucinates medical facts not present in the Source Documents or general safe knowledge.\n"
+        "Output ONLY JSON with two keys:\n"
+        "- 'status': 'PASS' if acceptable, 'FAIL' if it needs correction.\n"
+        "- 'feedback': If 'FAIL', explain what must be corrected. If 'PASS', leave empty."
+    )
+    
+    user_msg = (
+        f"Risk Level: {risk_level}\n"
+        f"Sources: {rag_ozet}\n\n"
+        f"AI Response to Evaluate: {yanit}"
+    )
+
+    try:
+        from langchain_core.messages import SystemMessage, HumanMessage
+        import json
+        res = await model.ainvoke([SystemMessage(content=sys_msg), HumanMessage(content=user_msg)])
+        result = json.loads(getattr(res, "content", "{}"))
+        
+        status = result.get("status", "PASS")
+        out["reflexion_status"] = status
+        out["reflexion_feedback"] = result.get("feedback", "")
+        
+        if status == "FAIL":
+            out["loop_count"] = loop_count + 1
+            
+    except Exception as e:
+        print(f"Reflexion Error: {e}")
+        out["reflexion_status"] = "PASS"
+
+    return out
+
+def route_after_reflexion(state: AgentState) -> Literal["Asistan_LLM", "__end__"]:
+    state_dict = state.model_dump() if hasattr(state, "model_dump") else dict(state)
+    status = state_dict.get("reflexion_status", "PASS")
+    if status == "FAIL":
+        return "Asistan_LLM"
+    return "__end__"
+
 def build_graph():
     g = StateGraph(AgentState)
     g.add_node("Sorgu_Siniflandirma", categorize_query)
@@ -348,6 +429,7 @@ def build_graph():
     g.add_node("Vektor_Veritabani_RAG", rag_node)
     g.add_node("Web_Ara_Tavily_Node", tavily_node)
     g.add_node("Asistan_LLM", agent_node)
+    g.add_node("Halisunasyon_Kontrol_Node", reflexion_node)
 
     g.set_entry_point("Sorgu_Siniflandirma")
     
@@ -358,8 +440,8 @@ def build_graph():
     
     g.add_edge("Web_Ara_Tavily_Node", "Asistan_LLM")
     
-    # Asistan son node
-    g.add_edge("Asistan_LLM", END)
+    g.add_edge("Asistan_LLM", "Halisunasyon_Kontrol_Node")
+    g.add_conditional_edges("Halisunasyon_Kontrol_Node", route_after_reflexion)
 
     return g.compile()
 

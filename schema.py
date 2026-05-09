@@ -25,3 +25,7 @@ class AgentState(BaseModel):
     raw_research_data: Optional[str] = Field(default="", description="Tavily API üzerinden asenkron kaydedilen araştırma verileri.")
     yanit: Optional[str] = Field(default="", description="LLM tarafından veya deterministik olarak üretilen son yanıt.")
 
+    loop_count: int = Field(default=0, description="Halisünasyon kontrol döngüsü sayacı.")
+    reflexion_status: Optional[str] = Field(default="", description="Reflexion node PASS/FAIL durumu.")
+    reflexion_feedback: Optional[str] = Field(default="", description="Reflexion node tarafından verilen düzeltme geri bildirimi.")
+
