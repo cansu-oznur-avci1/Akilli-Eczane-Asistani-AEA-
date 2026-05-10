@@ -25,4 +25,6 @@ pdfs/**/*.pdf
 pdfs/**/*.PDF
 
 data/users.json
+data/*.db
+data/*.sqlite3
 
