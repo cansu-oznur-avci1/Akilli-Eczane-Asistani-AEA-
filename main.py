@@ -302,14 +302,24 @@ async def agent_node(state: AgentState) -> dict:
         else:
             feedback_str = f"\n[KRİTİK DÜZELTME GEREKİYOR]: Önceki cevabın kalite kontrolünden geçemedi. Geri bildirim: {out.get('reflexion_feedback')}\nLütfen cevabını buna göre düzelt.\n"
 
-    user_prompt = (
-        f"GÜNCEL SORU: {question}\n\n"
-        f"ODAKLANILACAK İlaç: {out.get('ilac_adi', '')} | Madde: {out.get('etkilesen_madde', '')}\n"
-        f"Risk Seviyesi:{out.get('risk_level', 'Bilinmiyor')}\n\n"
-        f"GÜNCEL {evidence_label}\n"
-        f"{actual_evidence if actual_evidence else ('No specific sources found. Use expert pharmacology knowledge.' if lang == 'en' else 'Sistem veritabanında bu ilaca dair özel belge bulunamadı. Lütfen eczacılık uzmanlığını kullanarak detaylı yanıtla.')}\n"
-        f"{feedback_str}"
-    )
+    if lang == "en":
+        user_prompt = (
+            f"CURRENT QUESTION: {question}\n\n"
+            f"FOCUS DRUG: {out.get('ilac_adi', '')} | SUBSTANCE: {out.get('etkilesen_madde', '')}\n"
+            f"Risk Level: {out.get('risk_level', 'Unknown')}\n\n"
+            f"CURRENT {evidence_label}\n"
+            f"{actual_evidence if actual_evidence else 'No specific sources found. Use expert pharmacology knowledge.'}\n"
+            f"{feedback_str}"
+        )
+    else:
+        user_prompt = (
+            f"GÜNCEL SORU: {question}\n\n"
+            f"ODAKLANILACAK İlaç: {out.get('ilac_adi', '')} | Madde: {out.get('etkilesen_madde', '')}\n"
+            f"Risk Seviyesi:{out.get('risk_level', 'Bilinmiyor')}\n\n"
+            f"GÜNCEL {evidence_label}\n"
+            f"{actual_evidence if actual_evidence else 'Sistem veritabanında bu ilaca dair özel belge bulunamadı. Lütfen eczacılık uzmanlığını kullanarak detaylı yanıtla.'}\n"
+            f"{feedback_str}"
+        )
 
     invoke_msgs = [SystemMessage(content=system_prompt)]
     
@@ -448,6 +458,7 @@ def build_graph():
 async def run_agent_async(question: str, messages: list = None) -> dict:
     graph = build_graph()
     initial_state = AgentState(question=question, messages=messages or [], user_info={}).model_dump()
+        
     return await graph.ainvoke(initial_state)
 
 def run_agent(question: str, messages: list = None) -> dict:

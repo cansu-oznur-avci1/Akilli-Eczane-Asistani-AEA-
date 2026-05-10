@@ -57,10 +57,20 @@ if st.session_state.dark_theme:
     [data-testid="stAppViewContainer"] { background-color: #121212 !important; color: #E0E0E0 !important; }
     [data-testid="stSidebar"] { background-color: #1E1E1E !important; color: #E0E0E0 !important; border-right: 1px solid #333; }
     [data-testid="stHeader"] { background-color: #121212 !important; color: #E0E0E0 !important; }
-    .stMarkdown, p, h1, h2, h3, h4, span { color: #E0E0E0 !important; }
+    .stMarkdown, p, h1, h2, h3, h4, span, label, [data-testid="stWidgetLabel"] p, [data-testid="stExpander"] summary span { color: #E0E0E0 !important; }
     
     /* Fix buttons in dark mode */
-    .stButton>button { background-color: #2D2D2D !important; color: #E0E0E0 !important; border: 1px solid #444 !important; }
+    .stButton>button, [data-testid="stFormSubmitButton"]>button { background-color: #2D2D2D !important; color: #E0E0E0 !important; border: 1px solid #444 !important; }
+    
+    /* Fix file uploader */
+    [data-testid="stFileUploaderDropzone"] { background-color: #2D2D2D !important; border: 1px dashed #444 !important; }
+    [data-testid="stFileUploaderDropzone"] * { color: #E0E0E0 !important; }
+    [data-testid="stFileUploaderDropzone"] button { background-color: #1E1E1E !important; color: #E0E0E0 !important; border: 1px solid #555 !important; }
+    [data-testid="stFileUploader"] * { color: #E0E0E0 !important; }
+    
+    /* Fix toggle background */
+    [data-testid="stToggle"] [data-baseweb="checkbox"] > div:first-child { background-color: #333 !important; border: 1px solid #555 !important; }
+    
     /* Fix chat input area in dark mode */
     [data-testid="stBottom"], [data-testid="stBottom"] > div { background-color: #121212 !important; }
     [data-testid="stBottomBlockContainer"] { background-color: transparent !important; }
@@ -94,11 +104,24 @@ else:
     [data-testid="stAppViewContainer"] { background-color: #FFFFFF !important; color: #1C1C1E !important; }
     [data-testid="stSidebar"] { background-color: #F8F9FA !important; color: #1C1C1E !important; border-right: 1px solid #E5E5E5; }
     [data-testid="stHeader"] { background-color: #FFFFFF !important; color: #1C1C1E !important; }
-    .stMarkdown, p, h1, h2, h3, h4, span { color: #1C1C1E !important; }
+    .stMarkdown, p, h1, h2, h3, h4, span, label, [data-testid="stWidgetLabel"] p, [data-testid="stExpander"] summary span { color: #1C1C1E !important; }
     
     /* Fix buttons in light mode */
-    .stButton>button { background-color: #FFFFFF !important; color: #1C1C1E !important; border: 1px solid #CCC !important; }
-    .stButton>button:hover { border-color: #ff4b4b !important; color: #ff4b4b !important; }
+    .stButton>button, [data-testid="stFormSubmitButton"]>button { background-color: #FFFFFF !important; color: #1C1C1E !important; border: 1px solid #CCC !important; }
+    .stButton>button:hover, [data-testid="stFormSubmitButton"]>button:hover { border-color: #ff4b4b !important; color: #ff4b4b !important; }
+    
+    /* Fix file uploader */
+    [data-testid="stFileUploaderDropzone"] { background-color: #F8F9FA !important; border: 1px dashed #CCC !important; }
+    [data-testid="stFileUploaderDropzone"] * { color: #1C1C1E !important; }
+    [data-testid="stFileUploaderDropzone"] button { background-color: #FFFFFF !important; color: #1C1C1E !important; border: 1px solid #999 !important; }
+    [data-testid="stFileUploader"] * { color: #1C1C1E !important; }
+    
+    /* Fix toggle background */
+    [data-testid="stToggle"] [data-baseweb="checkbox"] > div:first-of-type { background-color: #999999 !important; border: 2px solid #666666 !important; }
+    [data-testid="stToggle"] [data-baseweb="checkbox"] > div:first-of-type > div { background-color: #FFFFFF !important; border: 1px solid #666 !important; }
+    
+    /* Fix top right menu (3 dots) text color */
+    ul[data-testid="main-menu-list"] span, ul[data-testid="main-menu-list"] p, ul[data-testid="main-menu-list"] a { color: #FFFFFF !important; font-weight: 500 !important; }
     
     /* Fix chat input area in light mode */
     [data-testid="stBottom"], [data-testid="stBottom"] > div { background-color: #FFFFFF !important; }
@@ -383,10 +406,10 @@ def admin_page():
     temp = st.slider("Temperature", 0.0, 1.0, float(os.getenv("GROQ_TEMPERATURE", "0.2")), 0.05)
     os.environ["GROQ_TEMPERATURE"] = str(temp)
 
-    rag_k = st.slider("RAG Chunk Sayısı (k)", 1, 8, 4)
+    rag_k = st.slider(get_text(lang, "admin_rag_chunk"), 1, 8, 4)
     os.environ["AEA_RAG_K"] = str(rag_k)
 
-    web_search = st.toggle("Web Search Fallback", value=False)
+    web_search = st.toggle(get_text(lang, "admin_web_search"), value=False)
     os.environ["AEA_WEB_SEARCH"] = "1" if web_search else "0"
 
     st.divider()
@@ -450,7 +473,8 @@ def admin_page():
                     with open(os.path.join("pdfs", uf.name), "wb") as f:
                         f.write(uf.getbuffer())
                 
-                st.info(f"{len(uploaded_files)} PDF dosyası kaydedildi. Vektör veritabanı güncelleniyor, lütfen bekleyin...")
+                msg = get_text(lang, "status_pdf_saved").format(count=len(uploaded_files))
+                st.info(msg)
                 
                 try:
                     from vector_db.ingest_data import ingest

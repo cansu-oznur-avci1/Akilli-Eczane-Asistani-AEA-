@@ -78,7 +78,7 @@ python main.py "Enapril ile Alkol etkileşimi nedir?"
 
 ## 🔍 Gözlemlenebilirlik
 
-Sistem, LangChain ekosistemi ile tam uyumludur. `.env` dosyasında LangSmith veya LangFuse anahtarlarınızı aktif ederek:
+Sistem, LangChain ekosistemi ile tam uyumludur. `.env` dosyasında LangSmith API anahtarınızı aktif ederek:
 -   Girdi/Çıktı kalitesini ölçebilir,
 -   Hata ayıklama süreçlerini hızlandırabilir,
 -   RAG performansını (Hit Rate, Faithfulness) takip edebilirsiniz.

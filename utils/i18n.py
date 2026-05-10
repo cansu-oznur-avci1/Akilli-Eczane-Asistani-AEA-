@@ -59,7 +59,10 @@ translations = {
         "success_db_updated": "Veritabanı başarıyla güncellendi!",
         "warning_select_pdf": "Lütfen önce PDF dosyası seçin.",
         "status_rebuilding_db": "Mevcut PDF'ler ile veritabanı baştan oluşturuluyor...",
-        "success_db_reset": "Veritabanı başarıyla sıfırlandı ve yeniden oluşturuldu!"
+        "success_db_reset": "Veritabanı başarıyla sıfırlandı ve yeniden oluşturuldu!",
+        "admin_rag_chunk": "RAG Chunk Sayısı (k)",
+        "admin_web_search": "Web Arama (Fallback)",
+        "status_pdf_saved": "{count} PDF dosyası kaydedildi. Vektör veritabanı güncelleniyor, lütfen bekleyin..."
     },
     "en": {
         "app_title": "💊 Smart Pharmacist Assistant (SPA)",
@@ -121,7 +124,10 @@ translations = {
         "success_db_updated": "Database updated successfully!",
         "warning_select_pdf": "Please select a PDF file first.",
         "status_rebuilding_db": "Rebuilding database with existing PDFs...",
-        "success_db_reset": "Database reset and rebuilt successfully!"
+        "success_db_reset": "Database reset and rebuilt successfully!",
+        "admin_rag_chunk": "RAG Chunk Count (k)",
+        "admin_web_search": "Web Search Fallback",
+        "status_pdf_saved": "{count} PDF file(s) saved. Updating vector database, please wait..."
     }
 }
 
