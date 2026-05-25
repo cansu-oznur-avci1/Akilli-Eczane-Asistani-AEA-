@@ -1,6 +1,8 @@
 from dotenv import load_dotenv
 load_dotenv()
+import sys
 import os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import re
 from typing import List, Literal, Any, Dict
 
