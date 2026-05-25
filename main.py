@@ -273,16 +273,16 @@ async def agent_node(state: AgentState) -> dict:
     out = dict(state_dict)
     question = out.get("question", "") or ""
     messages = list(out.get("messages", []))
-
+    
     KIMLIK_KELIMELERI = [
-        "kimsin", "kim yaptı", "kim icat", "kim geliştirdi", "kim kurdu", "seni kim", "ne yaparsın", "kendin tanıt", "hakkında bilgi ver",
-        "who are you", "who created you", "who developed you", "who made you", "who programmed you", "what do you do", "introduce yourself", "tell me about yourself", "who built you"
+        "kimsin", "kim yaptı", "kim icat", "kim geliştirdi", "kim kurdu", "seni kim", "ne yaparsın", "kendin tanıt", "hakkında bilgi ver", "yapan kim", "yazan kim",
+        "who are you", "who created you", "who developed you", "who made you", "who programmed you", "what do you do", "introduce yourself", "tell me about yourself", "who built you", "who invented you", "who invented", "creator", "developer", "inventor"
     ]
     if any(k in question.casefold() for k in KIMLIK_KELIMELERI):
         if not messages or not isinstance(messages[-1], AIMessage):
             lang_check = out.get("user_info", {}).get("lang", "tr")
             # If lang is en or if the question contains English terms
-            if lang_check == "en" or any(e in question.casefold() for e in ["who are you", "who created", "who developed", "who made", "who programmed", "introduce yourself", "tell me about"]):
+            if lang_check == "en" or any(e in question.casefold() for e in ["who are you", "who created", "who developed", "who made", "who programmed", "introduce yourself", "tell me about", "who invented", "creator", "developer", "inventor"]):
                 out["yanit"] = "I am the Smart Pharmacist Assistant (SPA), developed by computer engineering students (Cansu Öznur AVCI, Asya Mina ATİK, Elifnur ŞİMŞEK) under the supervision of Prof. Dr. Ramazan Katırcı."
             else:
                 out["yanit"] = "Ben bilgisayar mühendisliği öğrencileri (Cansu Öznur AVCI, Asya Mina ATİK, Elifnur ŞİMŞEK) tarafından Prof. Dr. Ramazan Katırcı danışmanlığında geliştirilen Akıllı Eczacı Asistanıyım (AEA)."
@@ -302,6 +302,7 @@ async def agent_node(state: AgentState) -> dict:
             "3. USE EVIDENCE: Use provided CURRENT SOURCES. If no info, use your expert pharmacology knowledge. Do not say 'Not found in sources', just answer naturally.\n"
             "4. MAINTAIN CONTEXT: Consider chat history but do not mix old drugs with new ones.\n"
             "5. STATE RISK LEVEL: If a Risk Level is provided, state it clearly and explain it.\n"
+            "6. IDENTITY EXCLUSIVITY: If asked about your creators, developers, or who made/invented you, you must EXCLUSIVELY state that you were developed by computer engineering students Cansu Öznur AVCI, Asya Mina ATİK, Elifnur ŞİMŞEK under the supervision of Prof. Dr. Ramazan Katırcı. NEVER invent other scientists or institutions.\n"
             "IMPORTANT: YOU MUST RESPOND IN ENGLISH AND USE GORGEOUS MARKDOWN STRUCTURE WITH PARAGRAPHS AND SUBHEADINGS (e.g., ### Intended Use)."
         )
         evidence_label = "🌐 SOURCES:"
@@ -315,6 +316,7 @@ async def agent_node(state: AgentState) -> dict:
             "3. KANIT KULLANIMI: Sana sağlanan GÜNCEL KAYNAKLAR'ı öncelikli olarak kullan. Kaynaklarda yoksa genel tıbbi bilgiyle DOĞAL bir yanıt ver, 'kaynakta bulamadım' deme.\n"
             "4. BAĞLAMI KORU: Önceki sorulardaki ilaçların yan etkilerini yeni sorudaki ilaçlara KARIŞTIRMA.\n"
             "5. RİSK SEVİYESİ: Bağlamda bir 'Risk Seviyesi' varsa, bunu mutlaka belirt ve açıkla.\n"
+            "6. KİMLİK KURALI: Eğer sana kimin geliştirdiği, icat ettiği veya kurduğu sorulursa, KESİNLİKLE sadece bilgisayar mühendisliği öğrencileri Cansu Öznur AVCI, Asya Mina ATİK, Elifnur ŞİMŞEK tarafından Prof. Dr. Ramazan Katırcı danışmanlığında geliştirildiğini söylemelisin. Başka hayali bilim insanları (örn: Dr. John Smith) veya kurumlar uydurma.\n"
             "ÖNEMLİ: Cevapların her zaman görsel olarak okunaklı, profesyonel paragraflar ve başlıklarla (Örn: ### Kullanım Amacı) yapılandırılmış olmalıdır."
         )
         evidence_label = "🌐 KAYNAKLAR:"
