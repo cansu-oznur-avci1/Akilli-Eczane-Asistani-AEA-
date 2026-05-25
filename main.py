@@ -274,10 +274,18 @@ async def agent_node(state: AgentState) -> dict:
     question = out.get("question", "") or ""
     messages = list(out.get("messages", []))
 
-    KIMLIK_KELIMELERI = ["kimsin", "kim yaptı", "kim icat", "kim geliştirdi", "kim kurdu", "seni kim", "ne yaparsın", "kendin tanıt", "hakkında bilgi ver", "who are you", "what are you"]
+    KIMLIK_KELIMELERI = [
+        "kimsin", "kim yaptı", "kim icat", "kim geliştirdi", "kim kurdu", "seni kim", "ne yaparsın", "kendin tanıt", "hakkında bilgi ver",
+        "who are you", "who created you", "who developed you", "who made you", "who programmed you", "what do you do", "introduce yourself", "tell me about yourself", "who built you"
+    ]
     if any(k in question.casefold() for k in KIMLIK_KELIMELERI):
         if not messages or not isinstance(messages[-1], AIMessage):
-            out["yanit"] = "Ben bilgisayar mühendisliği öğrencileri (Cansu Öznur AVCI, Asya Mina ATİK, Elifnur ŞİMŞEK) tarafından Prof. Dr. Ramazan Katırcı danışmanlığında geliştirilen Akıllı Eczacı Asistanıyım (AEA)."
+            lang_check = out.get("user_info", {}).get("lang", "tr")
+            # If lang is en or if the question contains English terms
+            if lang_check == "en" or any(e in question.casefold() for e in ["who are you", "who created", "who developed", "who made", "who programmed", "introduce yourself", "tell me about"]):
+                out["yanit"] = "I am the Smart Pharmacist Assistant (SPA), developed by computer engineering students (Cansu Öznur AVCI, Asya Mina ATİK, Elifnur ŞİMŞEK) under the supervision of Prof. Dr. Ramazan Katırcı."
+            else:
+                out["yanit"] = "Ben bilgisayar mühendisliği öğrencileri (Cansu Öznur AVCI, Asya Mina ATİK, Elifnur ŞİMŞEK) tarafından Prof. Dr. Ramazan Katırcı danışmanlığında geliştirilen Akıllı Eczacı Asistanıyım (AEA)."
             messages.append(AIMessage(content=out["yanit"]))
             out["messages"] = messages
         return out
