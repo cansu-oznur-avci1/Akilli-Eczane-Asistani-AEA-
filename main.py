@@ -19,9 +19,14 @@ _INTERACTION_WORDS = [
     "etkileşim", "etkilesim", "etkileşimi", "etkilesimi", "birlikte", "aynı anda",
     "eş zamanlı", "birlikte al", "ilaç-ilaç", "ilaç-besin",
     "tüketebilir", "tüketilir", "alınabilir", "kullanılabilir mi", "beraber", "kombine",
+    "interaction", "interactions", "together", "co-administer", "coadministration", 
+    "combined", "simultaneously", "concomitant", "with"
 ]
 
-_SIDE_EFFECT_WORDS = ["yan etki", "yanetki", "yan etkisi", "zarar", "advers", "ne olur"]
+_SIDE_EFFECT_WORDS = [
+    "yan etki", "yanetki", "yan etkisi", "zarar", "advers", "ne olur",
+    "side effect", "side effects", "adverse", "adverse reaction", "harm", "risk"
+]
 
 _GENERAL_WORDS = [
     "nedir", "kullanım", "kullanımı", "kullanılır", "ne için", "niçin", "doz",
@@ -29,6 +34,8 @@ _GENERAL_WORDS = [
     "özellik", "genel bilgi", "ne işe", "nasıl kullan", "dozaj", "muadil",
     "eşdeğer", "prospektüs", "ne zaman", "kimler kullan", "içeriği", "içerir",
     "kullanılabilir", "hakkında bilgi", "bilgi ver",
+    "what is", "usage", "use", "indication", "dosage", "warnings", "active ingredient",
+    "pharmacology", "prospectus", "substitute", "details"
 ]
 
 def _normalize_entity(s: str) -> str:
@@ -45,26 +52,27 @@ def _categorize_query_text(q: str) -> str:
 
 def _extract_interaction_entities(q: str) -> tuple[str, str]:
     q_norm = q.replace("\n", " ").strip()
-    m_sonda_ile = re.search(r"^(?P<a>\S+)\s+(?P<b>.+?)\s+ile\s+(?:kullanıl|tüketil|alın|birlikte)", q_norm, flags=re.IGNORECASE)
+    m_sonda_ile = re.search(r"^(?P<a>\S+)\s+(?P<b>.+?)\s+(?:ile|with)\s+(?:kullanıl|tüketil|alın|birlikte|take|use|together)", q_norm, flags=re.IGNORECASE)
     if m_sonda_ile:
         a, b = _normalize_entity(m_sonda_ile.group("a")), _normalize_entity(m_sonda_ile.group("b"))
         if a and b and len(a) >= 2 and len(b) >= 2: return a, b
     patterns = [
-        r"(?P<a>.+?)\s+(?:ile|ve)\s+(?P<b>.+?)\s+etkile\w*",
-        r"(?P<a>.+?)\s+(?:ile|ve)\s+(?P<b>.+?)\s+(?:birlikte|aynı anda|eş zamanlı)",
-        r"(?P<a>.+?)\s+(?:ile|birlikte)\s+(?P<b>.+)$",
-        r"(?P<a>[A-Za-zÇçĞğİıÖöŞşÜüa-z]+(?:\s+[A-Za-zÇçĞğİıÖöŞşÜüa-z]+)*?)\s+(?P<b>.+?)\s+ile\s+birlikte",
-        r"(?P<a>.+?)\s+ile\s+(?P<b>.+?)\s+kullanıl",
+        r"(?P<a>.+?)\s+(?:ile|ve|and)\s+(?P<b>.+?)\s+(?:etkile\w*|interaction\w*)",
+        r"(?P<a>.+?)\s+(?:ile|ve|and)\s+(?P<b>.+?)\s+(?:birlikte|aynı anda|eş zamanlı|together|simultaneously)",
+        r"(?P<a>.+?)\s+(?:ile|birlikte|with)\s+(?P<b>.+)$",
+        r"(?P<a>[A-Za-zÇçĞğİıÖöŞşÜüa-z]+(?:\s+[A-Za-zÇçĞğİıÖöŞşÜüa-z]+)*?)\s+(?P<b>.+?)\s+(?:ile\s+birlikte|with)",
+        r"(?P<a>.+?)\s+(?:ile|with)\s+(?P<b>.+?)\s+(?:kullanıl|take|use)",
     ]
     for pat in patterns:
         m = re.search(pat, q_norm, flags=re.IGNORECASE)
         if m:
             a, b = _normalize_entity(m.group("a")), _normalize_entity(m.group("b"))
             if a and b and len(a) <= 80 and len(b) <= 80: return a, b
-    if " ile " in q_norm.casefold():
-        m_once = re.search(r"^(?P<a>.+?)\s+ile\s+(?P<b>.+?)\s+birlikte", q_norm, flags=re.IGNORECASE)
+    if " ile " in q_norm.casefold() or " with " in q_norm.casefold():
+        conj = "ile" if " ile " in q_norm.casefold() else "with"
+        m_once = re.search(rf"^(?P<a>.+?)\s+{conj}\s+(?P<b>.+?)\s+(?:birlikte|together)", q_norm, flags=re.IGNORECASE)
         if m_once: return _normalize_entity(m_once.group("a")), _normalize_entity(m_once.group("b"))
-        m_std = re.search(r"^(?P<a>.+?)\s+ile\s+(?P<b>.+?)(?:\s+birlikte|\s+kullanıl|\s+tüket|\s+alın|\s*$)", q_norm, flags=re.IGNORECASE)
+        m_std = re.search(rf"^(?P<a>.+?)\s+{conj}\s+(?P<b>.+?)(?:\s+birlikte|\s+kullanıl|\s+tüket|\s+alın|\s+take|\s+use|\s*$)", q_norm, flags=re.IGNORECASE)
         if m_std: return _normalize_entity(m_std.group("a")), _normalize_entity(m_std.group("b"))
     return "", ""
 
@@ -72,14 +80,21 @@ def _extract_side_effect_entities(q: str) -> tuple[str, str]:
     q_norm = q.replace("\n", " ").strip()
     m = re.search(r"(?P<ilac>.+?)\s*(?:’|')?(?:in|ın|un|ün|nin|nın|nun|nün)?\s+yan\s+etk\w*", q_norm, flags=re.IGNORECASE)
     if m: return _normalize_entity(m.group("ilac")), ""
+    m_en = re.search(r"side\s+effect\w*\s+of\s+(?P<ilac>.+)", q_norm, flags=re.IGNORECASE)
+    if m_en: return _normalize_entity(m_en.group("ilac")), ""
+    m_en2 = re.search(r"(?P<ilac>.+?)\s+side\s+effect\w*", q_norm, flags=re.IGNORECASE)
+    if m_en2: return _normalize_entity(m_en2.group("ilac")), ""
     if " ile " in q_norm.casefold():
         parts = re.split(r"\bile\b", q_norm, flags=re.IGNORECASE)
+        return _normalize_entity(parts[0]), ""
+    if " with " in q_norm.casefold():
+        parts = re.split(r"\bwith\b", q_norm, flags=re.IGNORECASE)
         return _normalize_entity(parts[0]), ""
     return "", ""
 
 def _extract_general_entities(q: str) -> str:
     q_norm = q.replace("\n", " ").strip()
-    m = re.search(r"(?P<ilac>.+?)\s+(?:ne için|ne işe|nedir|nasıl|niçin|kullanım|kullanılır|doz|endikasyon|kontrendikasyon|yan etki)", q_norm, flags=re.IGNORECASE)
+    m = re.search(r"(?P<ilac>.+?)\s+(?:ne için|ne işe|nedir|nasıl|niçin|kullanım|kullanılır|doz|endikasyon|kontrendikasyon|yan etki|what is|how to|usage|dosage|side effect)", q_norm, flags=re.IGNORECASE)
     if m: return _normalize_entity(m.group("ilac"))
     
     # Eğer ilk kelimeler ilaç adıysa ve cümlenin devamı varsa (örn: "aferin forte hakkında bilgi ver")
@@ -275,11 +290,11 @@ async def agent_node(state: AgentState) -> dict:
             "You must respond with the depth of an expert pharmacist, using a detailed, informative, and patient-friendly tone.\n\n"
             "STRICT RULES:\n"
             "1. NO MEDICAL WARNINGS: NEVER use phrases like 'Consult your doctor', 'Seek medical advice', 'not medical advice', etc. Provide direct, clear information.\n"
-            "2. DETAILED & ACCURATE: Do not give short answers. Explain the mechanism, usage, and details scientifically yet simply.\n"
+            "2. DETAILED & STRUCTURED RESPONSE: Do not give short answers. Explain the drug's mechanism of action and details using subheadings (e.g., ### Mechanism of Action), bullet points, and bold text in a very stylish, readable Markdown format.\n"
             "3. USE EVIDENCE: Use provided CURRENT SOURCES. If no info, use your expert pharmacology knowledge. Do not say 'Not found in sources', just answer naturally.\n"
             "4. MAINTAIN CONTEXT: Consider chat history but do not mix old drugs with new ones.\n"
             "5. STATE RISK LEVEL: If a Risk Level is provided, state it clearly and explain it.\n"
-            "IMPORTANT: YOU MUST RESPOND IN ENGLISH."
+            "IMPORTANT: YOU MUST RESPOND IN ENGLISH AND USE GORGEOUS MARKDOWN STRUCTURE WITH PARAGRAPHS AND SUBHEADINGS (e.g., ### Intended Use)."
         )
         evidence_label = "🌐 SOURCES:"
     else:
