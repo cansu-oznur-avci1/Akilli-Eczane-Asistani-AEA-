@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 import streamlit as st
 from main import run_agent, run_agent_stream, generate_chat_title
 import os

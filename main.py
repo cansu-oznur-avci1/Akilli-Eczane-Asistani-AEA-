@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 import os
 import re
 from typing import List, Literal, Any, Dict
