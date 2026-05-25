@@ -11,7 +11,7 @@ Bu uygulama, hem deterministik (kural tabanlı) kontrolleri hem de LLM destekli 
 -   **Deterministik Kural Motoru:** Risk puanı ve kritik etkileşimler için önceden tanımlanmış veri tabanını kullanarak %100 doğruluk sağlar.
 -   **Gelişmiş RAG Sistemi:** KÜB (Kısa Ürün Bilgisi) ve KT (Kullanma Talimatı) PDF'leri üzerinden bağlamsal bilgi çıkarımı.
 -   **Self-Correction (Halisünasyon Kontrolü):** Reflexion Node ile model çıktıları yayınlanmadan önce risk çelişkileri ve uydurma bilgilere (halisünasyon) karşı otonom olarak denetlenir ve gerekirse model kendi cevabını düzeltir.
--   **Modern ve Profesyonel Arayüz:** Özel CSS mimarisi ile kusursuz çalışan **Karanlık (Dark) ve Aydınlık (Light) Tema** desteği. Giriş ekranı da dahil olmak üzere her aşamada değiştirilebilir.
+-   **Modern ve Profesyonel Arayüz:** Özel CSS mimarisi ile kusursuz çalışan **Karanlık (Dark) ve Aydınlık (Light) Tema** desteği. Giriş ekranı ve yerleşik ayarlar paneli (Settings modal) de dahil olmak üzere her arayüz aşaması, yüksek kontrastlı ve erişilebilir özel CSS seçicileriyle (örneğin `:first-of-type` checkbox entegrasyonu, modal başlık görünürlük kuralları) optimize edilmiştir.
 -   **Akıllı Sohbet Geçmişi:** Yapay zeka tarafından otomatik isimlendirilen, SQLite tabanlı kalıcı sohbet geçmişi.
 -   **Çoklu Dil Desteği (TR/EN):** Tek tuşla kullanıcı arayüzünü ve yapay zeka çıktılarını İngilizce veya Türkçe'ye çevirme.
 -   **Çok Sayfalı ve Güvenli Yapı (RBAC):** Admin ve User rolleri ile yetkilendirilmiş erişim kontrolü, şifre değiştirme ve kayıt yönetim sistemi.

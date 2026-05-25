@@ -3,7 +3,7 @@ translations = {
         "app_title": "💊 Akıllı Eczacı Asistanı (AEA)",
         "app_subtitle": "İlaç etkileşimleri, yan etkiler ve genel farmakoloji hakkında sorularınızı sorabilirsiniz.",
         "chat_history": "Sohbet Geçmişi",
-        "new_chat": "➕ Yeni Sohbet",
+        "new_chat": "+ Yeni Sohbet",
         "logout": "Çıkış Yap",
         "chat_input_placeholder": "Sorunuzu buraya yazın...",
         "status_analyze": "Soru analiz ediliyor...",
@@ -62,13 +62,17 @@ translations = {
         "success_db_reset": "Veritabanı başarıyla sıfırlandı ve yeniden oluşturuldu!",
         "admin_rag_chunk": "RAG Chunk Sayısı (k)",
         "admin_web_search": "Web Arama (Fallback)",
-        "status_pdf_saved": "{count} PDF dosyası kaydedildi. Vektör veritabanı güncelleniyor, lütfen bekleyin..."
+        "status_pdf_saved": "{count} PDF dosyası kaydedildi. Vektör veritabanı güncelleniyor, lütfen bekleyin...",
+        "continue_as_guest": "Giriş Yapmadan Devam Et",
+        "guest_warning": "Misafir oturumundasınız. Sohbet geçmişinizi kalıcı olarak kaydetmek için lütfen giriş yapın veya kayıt olun.",
+        "login_or_register": "Giriş Yap / Kayıt Ol",
+        "guest_user": "Misafir Kullanıcı"
     },
     "en": {
         "app_title": "💊 Smart Pharmacist Assistant (SPA)",
         "app_subtitle": "You can ask questions about drug interactions, side effects, and general pharmacology.",
         "chat_history": "Chat History",
-        "new_chat": "➕ New Chat",
+        "new_chat": "+ New Chat",
         "logout": "Logout",
         "chat_input_placeholder": "Type your question here...",
         "status_analyze": "Analyzing question...",
@@ -127,7 +131,11 @@ translations = {
         "success_db_reset": "Database reset and rebuilt successfully!",
         "admin_rag_chunk": "RAG Chunk Count (k)",
         "admin_web_search": "Web Search Fallback",
-        "status_pdf_saved": "{count} PDF file(s) saved. Updating vector database, please wait..."
+        "status_pdf_saved": "{count} PDF file(s) saved. Updating vector database, please wait...",
+        "continue_as_guest": "Continue without Login",
+        "guest_warning": "You are in a guest session. Please log in or register to permanently save your chat history.",
+        "login_or_register": "Login / Register",
+        "guest_user": "Guest User"
     }
 }
 
