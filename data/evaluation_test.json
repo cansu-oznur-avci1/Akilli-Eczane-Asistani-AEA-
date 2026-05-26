@@ -1,0 +1,34 @@
+[
+  {
+    "question": "A-Ferin Forte'nin yan etkileri nelerdir?",
+    "ground_truth": "A-Ferin Forte'nin yaygın yan etkileri arasında uyuklama, baş dönmesi, sersemlik, ağız kuruluğu, uyku bozuklukları, gastrointestinal rahatsızlıklar ve alerjik deri reaksiyonları bulunur. Ayrıca antihistaminik içeriği (klorfeniramin) nedeniyle uyuşukluğa ve konsantrasyon kaybına sebep olabilir."
+  },
+  {
+    "question": "Apranax Fort ne için kullanılır?",
+    "ground_truth": "Apranax Fort (naproksen sodyum), hafif ila orta dereceli ağrıların (romatizmal hastalıklar, osteoartrit, akut gut, migren, diş ağrısı, postoperatif ağrılar, dismenore vb.) dindirilmesinde ağrı kesici ve antiinflamatuar olarak kullanılır."
+  },
+  {
+    "question": "Warfmadin 10 mg ne işe yarar?",
+    "ground_truth": "Warfmadin 10 mg (warfarin sodyum) oral bir antikoagülandır (kan sulandırıcı). Kan pıhtısı oluşumunu önlemek veya mevcut pıhtıların büyümesini engellemek için tromboembolik bozuklukların tedavisinde ve profilaksisinde kullanılır."
+  },
+  {
+    "question": "Benexol B12 film tablet nasıl kullanılır?",
+    "ground_truth": "Benexol B12, hekim tarafından başka şekilde tavsiye edilmediği takdirde genellikle günde 1 tablet olarak, bütün olarak çiğnenmeden yeterli miktarda sıvı ile yutularak kullanılır."
+  },
+  {
+    "question": "Devit-3 yumuşak kapsülün dozajı nedir?",
+    "ground_truth": "Devit-3 yumuşak kapsülün dozajı, hastanın D vitamini eksikliğinin ciddiyetine ve klinik tablosuna göre doktor tarafından belirlenir. Genellikle haftalık veya aylık periyotlarla uygulanan yüksek dozaj şemaları mevcuttur."
+  },
+  {
+    "question": "Bonedro IV infüzyon hangi durumlarda kullanılır?",
+    "ground_truth": "Bonedro (zoledronik asit), osteoporoz tedavisinde (postmenopozal kadınlarda ve erkeklerde), paget hastalığı tedavisinde ve tümör kaynaklı hiperkalsemi veya maligniteye bağlı kemik komplikasyonlarının önlenmesinde kullanılır."
+  },
+  {
+    "question": "A-Ferin Sinüs ilacının etken maddeleri nelerdir?",
+    "ground_truth": "A-Ferin Sinüs ilacının etken maddeleri; parasetamol (ağrı kesici, ateş düşürücü), psödoefedrin hidroklorür (dekonjestan/burun tıkanıklığını giderici) ve klorfeniramin maleattır (antihistaminik)."
+  },
+  {
+    "question": "D-Colefor 5.000 I.U. hangi durumlarda kontrendikedir?",
+    "ground_truth": "D-Colefor 5.000 I.U., hiperkalsemi (kanda yüksek kalsiyum), hiperkalsiüri (idrarda yüksek kalsiyum), D hipervitaminozu, ciddi böbrek yetmezliği veya nefrolitiyazis (böbrek taşı) durumlarında kontrendikedir."
+  }
+]

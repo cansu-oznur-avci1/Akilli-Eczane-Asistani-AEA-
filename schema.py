@@ -10,7 +10,7 @@ class AgentState(BaseModel):
     messages: List[Any] = Field(default_factory=list, description="Mesajlaşma geçmişi (sohbet bağlamı).")
     user_info: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Kullanıcı metadataları (yaş, alerji, cinsiyet vb.)")
     
-    query_type: Optional[Literal["interaction", "side_effect", "general_info", "unknown"]] = Field(
+    query_type: Optional[Literal["interaction", "side_effect", "general_info", "unknown", "greeting"]] = Field(
         default=None, description="Sorgu tipi sınıflandırması."
     )
 

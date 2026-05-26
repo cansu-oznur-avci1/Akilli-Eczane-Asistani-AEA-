@@ -1150,6 +1150,60 @@ def admin_page():
             else:
                 st.warning(get_text(lang, "warning_select_pdf"))
 
+    # ─────────────────────────────────────────────────────────────
+    # RAG Sistem Değerlendirmesi — Önceden Üretilen Grafikler
+    # ─────────────────────────────────────────────────────────────
+    st.divider()
+    st.header(get_text(lang, "admin_eval_header"))
+    st.markdown(get_text(lang, "admin_eval_desc"))
+
+    _EVAL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "evaluation_results")
+    _BAR_PATH  = os.path.join(_EVAL_DIR, "average_scores.png")
+    _HEAT_PATH = os.path.join(_EVAL_DIR, "metric_scores_heatmap.png")
+
+    bar_exists  = os.path.exists(_BAR_PATH)
+    heat_exists = os.path.exists(_HEAT_PATH)
+
+    if bar_exists or heat_exists:
+        # ── Ortalama metrik sonuç özeti (JSON'dan oku) ──
+        _json_path = os.path.join(_EVAL_DIR, "results_summary.json")
+        if os.path.exists(_json_path):
+            import json as _json
+            with open(_json_path, "r", encoding="utf-8") as _f:
+                _averages = _json.load(_f)
+            _metric_labels = {
+                "context_precision": "Context Precision",
+                "context_recall":    "Context Recall",
+                "faithfulness":      "Faithfulness",
+                "answer_relevancy":  "Answer Relevancy",
+            }
+            st.subheader(get_text(lang, "admin_eval_avg_scores"))
+            _cols = st.columns(len(_averages))
+            for _col, (_k, _v) in zip(_cols, _averages.items()):
+                _label = _metric_labels.get(_k, _k)
+                _delta_color = "normal" if _v >= 0.5 else "inverse"
+                _col.metric(label=_label, value=f"{_v:.3f}", delta=f"{_v - 0.5:+.3f}", delta_color=_delta_color)
+            st.markdown("")
+
+        # ── Bar Grafiği ──
+        if bar_exists:
+            st.subheader(get_text(lang, "admin_eval_bar"))
+            st.image(_BAR_PATH, use_container_width=True)
+
+        # ── Isı Haritası ──
+        if heat_exists:
+            st.subheader(get_text(lang, "admin_eval_heatmap"))
+            st.image(_HEAT_PATH, use_container_width=True)
+    else:
+        st.info(
+            "📂 Grafik dosyaları henüz oluşturulmadı. "
+            "Terminalde `python evaluation/evaluate_rag.py` komutunu çalıştırarak grafikleri üretebilirsiniz."
+            if lang == "tr" else
+            "📂 Chart files not yet generated. "
+            "Run `python evaluation/evaluate_rag.py` in the terminal to produce the charts."
+        )
+
+
 if not st.session_state.logged_in and not st.session_state.get("guest_mode", False):
     login_page()
 elif st.session_state.role == "admin":

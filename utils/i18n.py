@@ -66,7 +66,17 @@ translations = {
         "continue_as_guest": "Giriş Yapmadan Devam Et",
         "guest_warning": "Misafir oturumundasınız. Sohbet geçmişinizi kalıcı olarak kaydetmek için lütfen giriş yapın veya kayıt olun.",
         "login_or_register": "Giriş Yap / Kayıt Ol",
-        "guest_user": "Misafir Kullanıcı"
+        "guest_user": "Misafir Kullanıcı",
+        "admin_eval_header": "🔬 RAG Sistem Değerlendirmesi",
+        "admin_eval_desc": "Akademik standartlarda RAG pipeline kalitesini ölçer. Context Precision, Context Recall, Faithfulness ve Answer Relevancy metriklerini hesaplar.",
+        "admin_eval_btn": "🚀 RAG Sistem Değerlendirmesini Çalıştır",
+        "admin_eval_running": "Değerlendirme çalışıyor, lütfen bekleyin... (Bu işlem birkaç dakika sürebilir.)",
+        "admin_eval_done": "✅ Değerlendirme tamamlandı!",
+        "admin_eval_avg_scores": "📊 Ortalama Metrik Skorları",
+        "admin_eval_bar": "📈 Ortalama Skor Grafiği",
+        "admin_eval_heatmap": "🗺️ Metrik Isı Haritası (Soru Bazında)",
+        "admin_eval_error": "Değerlendirme sırasında bir hata oluştu:",
+        "admin_eval_no_img": "Grafik dosyası henüz oluşturulmadı."
     },
     "en": {
         "app_title": "💊 Smart Pharmacist Assistant (SPA)",
@@ -135,7 +145,17 @@ translations = {
         "continue_as_guest": "Continue without Login",
         "guest_warning": "You are in a guest session. Please log in or register to permanently save your chat history.",
         "login_or_register": "Login / Register",
-        "guest_user": "Guest User"
+        "guest_user": "Guest User",
+        "admin_eval_header": "🔬 RAG System Evaluation",
+        "admin_eval_desc": "Measures RAG pipeline quality at academic standards. Computes Context Precision, Context Recall, Faithfulness, and Answer Relevancy metrics.",
+        "admin_eval_btn": "🚀 Run RAG System Evaluation",
+        "admin_eval_running": "Evaluation running, please wait... (This may take a few minutes.)",
+        "admin_eval_done": "✅ Evaluation complete!",
+        "admin_eval_avg_scores": "📊 Average Metric Scores",
+        "admin_eval_bar": "📈 Average Scores Chart",
+        "admin_eval_heatmap": "🗺️ Metric Heatmap (Per Question)",
+        "admin_eval_error": "An error occurred during evaluation:",
+        "admin_eval_no_img": "Chart file not yet generated."
     }
 }
 

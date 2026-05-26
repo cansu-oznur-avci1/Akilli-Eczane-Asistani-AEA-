@@ -28,3 +28,7 @@ data/users.json
 data/*.db
 data/*.sqlite3
 
+# Local development checkpointers & scratch files
+.langgraph_api/
+scratch/
+

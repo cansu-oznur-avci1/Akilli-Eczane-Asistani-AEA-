@@ -17,6 +17,7 @@ Bu uygulama, hem deterministik (kural tabanlı) risk kontrollerini hem de LLM de
 -   **Kalıcı SQLite Sohbet Geçmişi:** Sohbet içeriğine göre yapay zeka tarafından otomatik isimlendirilen dinamik sohbet kayıtları.
 -   **Gelişmiş Yönetici Paneli (RBAC):** Admin ve User rolleriyle yetkilendirilmiş arayüz. Admin paneli üzerinden model parametreleri (model seçimi, sıcaklık), RAG parametreleri ve kural tablosu düzenlenebilir; PDF yüklenerek vektör veritabanı canlı olarak güncellenebilir.
 -   **Gözlemlenebilirlik (Observability):** LangSmith entegrasyonu ile tüm ajan adımları ve LLM çağrıları anlık olarak izlenebilir.
+-   **Akıllı Selamlama (Greeting) Algılama:** Sistem, "merhaba", "selam", "iyi günler" gibi selamlama ve sohbet başlangıcı ifadelerini anında süzerek RAG/Vektör veritabanı arama ve Tavily web arama adımlarını atlar. Bu sayede hem yanıt süresi optimize edilmiş hem de gereksiz veritabanı sorgu maliyetleri sıfırlanmıştır. Selamlamalara özel olarak tasarlanan AEA tanıtım ve yardımsever yönlendirme promptu ile yanıt verilir.
 
 ---
 
@@ -37,6 +38,29 @@ Sistem şu ana bileşenlerden oluşur:
 
 Sistemin çalışma akış grafiği:
 ![LangGraph İş Akışı](AEA_flow.png)
+
+---
+
+## 📊 Değerlendirme Modülü / Evaluation Module
+
+Akıllı Eczacı Asistanı, RAG altyapısının ve LLM yanıtlarının kalitesini akademik standartlarda ölçmek amacıyla gelişmiş bir **Evaluation (Değerlendirme)** modülüne sahiptir.
+
+### Öne Çıkan Özellikler:
+1. **Değerlendirme Veri Seti (`data/evaluation_test.json`):** Sistemimizin doğruluğunu ölçmek için ideal (literatürde kesin ve doğru kabul edilen) soru-cevap çiftleri içeren altın standartta (`ground_truth`) test veri seti.
+2. **Akademik Değerlendirme Betiği (`evaluation/evaluate_rag.py`):** Asenkron olarak test seti sorularını LangGraph akışından geçirir ve elde edilen cevapları popüler **Ragas** çerçevesini kullanarak şu metrikler üzerinden ölçümler:
+   - **Faithfulness (Sadakat):** Modelin kaynak belgelere ne kadar bağlı kaldığı (halisünasyon oranı).
+   - **Answer Relevancy (Yanıt Uygunluğu):** Üretilen yanıtın kullanıcının sorusuyla ne kadar alakalı olduğu.
+   - **Context Precision (Bağlam Hassasiyeti):** RAG aşamasında çekilen kaynakların doğruluğu.
+   - **Context Recall (Bağlam Geri Çağırma):** İdeal cevaba kıyasla doğru kaynakların ne kadarının çekilebildiği.
+3. **Akademik Raporlama ve Görselleştirme:**
+   - Ortalama metrik skorlarını içeren `results_summary.json` raporu.
+   - Her soru için metrik başarılarını gösteren görsel ısı haritası (`metric_scores_heatmap.png`).
+   - Genel ortalama skorları özetleyen sütun grafik (`average_scores.png`).
+
+Değerlendirmeyi başlatmak için şu komutu çalıştırabilirsiniz:
+```bash
+python evaluation/evaluate_rag.py
+```
 
 ---
 
